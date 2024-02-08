@@ -172,6 +172,41 @@ class Integer {
     return Integer(is_positive(num_) ? num_ : -num_);
   }
 
+  constexpr Integer operator-() const noexcept(false) {
+    if (num_ == MIN) {
+      throw std::runtime_error("neg overflow");
+    }
+    return Integer(-num_);
+  }
+
+  constexpr std::optional<Integer> checked_neg() noexcept {
+    if (num_ == MIN) {
+      return {};
+    }
+    return Integer(-num_);
+  }
+
+  constexpr std::tuple<Integer, bool> overflowing_neg() noexcept {
+    if (num_ == MIN) {
+      return {Integer(MIN), true};
+    }
+    return {Integer(-num_), false};
+  }
+
+  constexpr Integer wrapping_neg() noexcept {
+    if (num_ == MIN) {
+      return Integer(MIN);
+    }
+    return Integer(-num_);
+  }
+
+  constexpr Integer saturating_neg() noexcept {
+    if (num_ == MIN) {
+      return Integer(MAX);
+    }
+    return Integer(-num_);
+  }
+
   constexpr bool operator==(const Integer<T> &other) const { return num_ == other.num_; }
   constexpr bool operator==(const T &other) const { return num_ == other; }
 

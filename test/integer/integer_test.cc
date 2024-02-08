@@ -917,3 +917,141 @@ TEST(IntegerTest, IntegerWrappingAbsNoSizeEffects) {
   auto _ = num.wrapping_abs();
   ASSERT_EQ(num, tmp_num);
 }
+
+TEST(IntegerTest, IntegerNeg) {
+  for (int32_t i = 0; i <= 1000; i += 10) {
+    Int32 num = i;
+    ASSERT_EQ(-num, Integer(-i));
+  }
+
+  for (int32_t i = -1000; i <= 0; i += 10) {
+    Int32 num = i;
+    ASSERT_EQ(num.abs(), -num);
+  }
+
+  Int32 max_num = Int32::MAX;
+  ASSERT_EQ(-max_num, Int32(-Int32::MAX));
+  Int32 min_num = Int32::MIN;
+  ASSERT_THROW(-min_num, std::runtime_error);
+}
+
+TEST(IntegerTest, IntegerNegNoSizeEffects) {
+  Int32 num = 10_i32;
+  Int32 tmp_num = num;
+  ASSERT_EQ(num, tmp_num);
+
+  auto _ = -num;
+  ASSERT_EQ(num, tmp_num);
+}
+
+TEST(IntegerTest, IntegerCheckedNeg) {
+  for (int32_t i = 0; i <= 1000; i += 10) {
+    Int32 num = i;
+    ASSERT_EQ(num.checked_neg(), Integer(-i));
+  }
+
+  for (int32_t i = -1000; i <= 0; i += 10) {
+    Int32 num = i;
+    ASSERT_EQ(num.checked_neg(), num.checked_abs());
+  }
+
+  Int32 max_num = Int32::MAX;
+  ASSERT_EQ(max_num.checked_neg(), Int32(-Int32::MAX));
+  Int32 min_num = Int32::MIN;
+  ASSERT_EQ(min_num.checked_neg(), std::nullopt);
+}
+
+TEST(IntegerTest, IntegerCheckedNegNoSizeEffects) {
+  Int32 num = 10_i32;
+  Int32 tmp_num = num;
+  ASSERT_EQ(num, tmp_num);
+
+  auto _ = num.checked_neg();
+  ASSERT_EQ(num, tmp_num);
+}
+
+TEST(IntegerTest, IntegerOverflowingNeg) {
+  for (int32_t i = 0; i <= 1000; i += 10) {
+    Int32 num = i;
+    auto [ret, flag] = num.overflowing_neg();
+    ASSERT_FALSE(flag);
+    ASSERT_EQ(ret, Integer(-i));
+  }
+
+  for (int32_t i = -1000; i <= 0; i += 10) {
+    Int32 num = i;
+    auto [ret, flag] = num.overflowing_neg();
+    ASSERT_FALSE(flag);
+    ASSERT_EQ(ret, num.checked_abs());
+  }
+
+  Int32 max_num = Int32::MAX;
+  auto [ret, flag] = max_num.overflowing_neg();
+  ASSERT_FALSE(flag);
+  ASSERT_EQ(ret, Int32(-Int32::MAX));
+  Int32 min_num = Int32::MIN;
+  std::tie(ret, flag) = min_num.overflowing_neg();
+  ASSERT_TRUE(flag);
+  ASSERT_EQ(ret, min_num);
+}
+
+TEST(IntegerTest, IntegerOverflowingNegNoSizeEffects) {
+  Int32 num = 10_i32;
+  Int32 tmp_num = num;
+  ASSERT_EQ(num, tmp_num);
+
+  auto _ = num.overflowing_neg();
+  ASSERT_EQ(num, tmp_num);
+}
+
+TEST(IntegerTest, IntegerWrappingNeg) {
+  for (int32_t i = 0; i <= 1000; i += 10) {
+    Int32 num = i;
+    ASSERT_EQ(num.wrapping_neg(), Integer(-i));
+  }
+
+  for (int32_t i = -1000; i <= 0; i += 10) {
+    Int32 num = i;
+    ASSERT_EQ(num.wrapping_neg(), num.checked_abs());
+  }
+
+  Int32 max_num = Int32::MAX;
+  ASSERT_EQ(max_num.wrapping_neg(), Int32(-Int32::MAX));
+  Int32 min_num = Int32::MIN;
+  ASSERT_EQ(min_num.wrapping_neg(), min_num);
+}
+
+TEST(IntegerTest, IntegerWrappingNegNoSizeEffects) {
+  Int32 num = 10_i32;
+  Int32 tmp_num = num;
+  ASSERT_EQ(num, tmp_num);
+
+  auto _ = num.wrapping_neg();
+  ASSERT_EQ(num, tmp_num);
+}
+
+TEST(IntegerTest, IntegerSaturatingNeg) {
+  for (int32_t i = 0; i <= 1000; i += 10) {
+    Int32 num = i;
+    ASSERT_EQ(num.saturating_neg(), Integer(-i));
+  }
+
+  for (int32_t i = -1000; i <= 0; i += 10) {
+    Int32 num = i;
+    ASSERT_EQ(num.saturating_neg(), num.checked_abs());
+  }
+
+  Int32 max_num = Int32::MAX;
+  ASSERT_EQ(max_num.saturating_neg(), Int32(-Int32::MAX));
+  Int32 min_num = Int32::MIN;
+  ASSERT_EQ(min_num.saturating_neg(), max_num);
+}
+
+TEST(IntegerTest, IntegerSaturatingNegNoSizeEffects) {
+  Int32 num = 10_i32;
+  Int32 tmp_num = num;
+  ASSERT_EQ(num, tmp_num);
+
+  auto _ = num.saturating_neg();
+  ASSERT_EQ(num, tmp_num);
+}
