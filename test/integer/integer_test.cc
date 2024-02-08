@@ -165,8 +165,9 @@ TEST(IntegerTest, IntegerOverflowingAdd) {
   {
     auto num = 10_i16;
     Integer<short> num1 = Integer<short>::MAX;
-    auto [_, flag] = num.overflowing_add(num1);
+    auto [ret, flag] = num.overflowing_add(num1);
     ASSERT_TRUE(flag);
+    ASSERT_EQ(ret, 10 + Integer<short>::MAX);
   }
 
   {
@@ -383,9 +384,10 @@ TEST(IntegerTest, IntegerCheckedSubNoSideEffects) {
 TEST(IntegerTest, IntegerOverflowingSub) {
   for (short n = 1; n < 1000; n++) {
     Int16 num = n;
-    Int16 num1 = Integer<short>::MIN;
-    auto [_, flag] = num1.overflowing_sub(num);
+    Int16 num1 = Int16::MIN;
+    auto [ret, flag] = num1.overflowing_sub(num);
     ASSERT_TRUE(flag);
+    ASSERT_EQ(ret,  Int16::MIN - n);
   }
 
   for (int16_t n = std::numeric_limits<int16_t>::max(); n > std::numeric_limits<int16_t>::min(); n--) {
@@ -396,8 +398,9 @@ TEST(IntegerTest, IntegerOverflowingSub) {
   }
 
   Int16 num = Int16::MIN;
-  auto [_, flag] = num.overflowing_sub(1);
+  auto [ret, flag] = num.overflowing_sub(1);
   ASSERT_TRUE(flag);
+  ASSERT_EQ(ret, Int16::MIN - 1);
 }
 
 TEST(IntegerTest, IntegerOverflowingSubNoSideEffects) {
@@ -548,7 +551,8 @@ TEST(IntegerTest, IntegerCheckedMulNoSideEffects) {
 TEST(IntegerTest, IntegerOverflowingMul) {
   auto num = 10_i8;
   auto num1 = 100_i8;
-  auto [_, flag] = num1.overflowing_mul(num);
+  auto [ret, flag] = num1.overflowing_mul(num);
+  ASSERT_EQ(ret, int8_t(10 * 100));
   ASSERT_TRUE(flag);
 
   constexpr int32_t min = 10;
@@ -732,8 +736,9 @@ TEST(IntegerTest, IntegerOverflowingDiv) {
 
   Int8 num = -1;
   Int8 num1 = Int8::MIN;
-  auto [_, flag] = num1.overflowing_div(num);
+  auto [ret, flag] = num1.overflowing_div(num);
   ASSERT_TRUE(flag);
+  ASSERT_EQ(ret, -1 * Int8::MIN);
 }
 
 TEST(IntegerTest, IntegerOverflowingDivNoSideEffects) {
