@@ -6,7 +6,7 @@
 #include <optional>
 #include <type_traits>
 
-template <typename T, typename = std::enable_if_t<std::is_integral<T>::value>>
+template <typename T, typename = std::enable_if_t<std::is_signed<T>::value>>
 class Integer {
  public:
   constexpr static T MIN = std::numeric_limits<T>::min();
@@ -32,10 +32,7 @@ class Integer {
   }
 
   constexpr std::tuple<Integer<T>, bool> overflowing_add(const Integer<T> &other) noexcept {
-    if (add_overflow(num_, other.num_)) {
-      return {{}, true};
-    }
-    return {Integer(num_ + other.num_), false};
+    return {Integer(num_ + other.num_), add_overflow(num_, other.num_)};
   }
 
   constexpr Integer<T> saturating_add(const Integer<T> &other) noexcept {
@@ -63,10 +60,7 @@ class Integer {
   }
 
   constexpr std::tuple<Integer<T>, bool> overflowing_sub(const Integer<T> &other) noexcept {
-    if (sub_overflow(num_, other.num_)) {
-      return {{}, true};
-    }
-    return {Integer(num_ - other.num_), false};
+    return {Integer(num_ - other.num_), sub_overflow(num_, other.num_)};
   }
 
   constexpr Integer saturating_sub(const Integer<T> &other) noexcept {
@@ -94,10 +88,7 @@ class Integer {
   }
 
   constexpr std::tuple<Integer<T>, bool> overflowing_div(const Integer<T> &other) noexcept {
-    if (div_overflow(num_, other.num_)) {
-      return {{}, true};
-    }
-    return {Integer(num_ / other.num_), false};
+    return {Integer(num_ / other.num_), div_overflow(num_, other.num_)};
   }
 
   constexpr Integer saturating_div(const Integer<T> &other) noexcept {
@@ -124,10 +115,7 @@ class Integer {
   }
 
   constexpr std::tuple<Integer<T>, bool> overflowing_mul(const Integer<T> &other) noexcept {
-    if (mul_overflow(num_, other.num_)) {
-      return {{}, true};
-    }
-    return {Integer(num_ * other.num_), false};
+    return {Integer(num_ * other.num_), mul_overflow(num_, other.num_)};
   }
 
   constexpr Integer saturating_mul(const Integer<T> &other) noexcept {
@@ -135,6 +123,76 @@ class Integer {
       return has_same_signal(num_, other.num_) ? MAX : MIN;
     }
     return Integer(num_ * other.num_);
+  }
+
+  constexpr Integer abs() noexcept(false) {
+    if (num_ == MIN) {
+      throw std::runtime_error("abs overflow");
+    }
+    return Integer(is_positive(num_) ? num_ : -num_);
+  }
+
+  constexpr std::optional<Integer> checked_abs() noexcept {
+    if (num_ == MIN) {
+      return {};
+    }
+    return Integer(is_positive(num_) ? num_ : -num_);
+  }
+
+  constexpr std::tuple<Integer, bool> overflowing_abs() noexcept {
+    if (num_ == MIN) {
+      return {Integer(MIN), true};
+    }
+    return {Integer(is_positive(num_) ? num_ : -num_), false};
+  }
+
+  constexpr Integer wrapping_abs() noexcept {
+    if (num_ == MIN) {
+      return Integer(MIN);
+    }
+    return Integer(is_positive(num_) ? num_ : -num_);
+  }
+
+  constexpr Integer saturating_abs() noexcept {
+    if (num_ == MIN) {
+      return Integer(MAX);
+    }
+    return Integer(is_positive(num_) ? num_ : -num_);
+  }
+
+  constexpr Integer operator-() const noexcept(false) {
+    if (num_ == MIN) {
+      throw std::runtime_error("neg overflow");
+    }
+    return Integer(-num_);
+  }
+
+  constexpr std::optional<Integer> checked_neg() noexcept {
+    if (num_ == MIN) {
+      return {};
+    }
+    return Integer(-num_);
+  }
+
+  constexpr std::tuple<Integer, bool> overflowing_neg() noexcept {
+    if (num_ == MIN) {
+      return {Integer(MIN), true};
+    }
+    return {Integer(-num_), false};
+  }
+
+  constexpr Integer wrapping_neg() noexcept {
+    if (num_ == MIN) {
+      return Integer(MIN);
+    }
+    return Integer(-num_);
+  }
+
+  constexpr Integer saturating_neg() noexcept {
+    if (num_ == MIN) {
+      return Integer(MAX);
+    }
+    return Integer(-num_);
   }
 
   constexpr bool operator==(const Integer<T> &other) const { return num_ == other.num_; }
