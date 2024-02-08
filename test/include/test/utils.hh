@@ -1,0 +1,1 @@
+int random_integer(int min, int max);
