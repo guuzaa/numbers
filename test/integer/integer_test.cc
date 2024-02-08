@@ -801,7 +801,7 @@ TEST(IntegerTest, IntegerAbs) {
   ASSERT_THROW(min_num.abs(), std::runtime_error);
 }
 
-TEST(IntegerTest, IntegerAbsNoSizeEffects) {
+TEST(IntegerTest, IntegerAbsNoSideEffects) {
   Int32 num = 10_i32;
   Int32 tmp_num = num;
   ASSERT_EQ(num, tmp_num);
@@ -835,7 +835,7 @@ TEST(IntegerTest, IntegerOverflowingAbs) {
   ASSERT_EQ(ret, min_num);
 }
 
-TEST(IntegerTest, IntegerOverflowingAbsNoSizeEffects) {
+TEST(IntegerTest, IntegerOverflowingAbsNoSideEffects) {
   Int32 num = 10_i32;
   Int32 tmp_num = num;
   ASSERT_EQ(num, tmp_num);
@@ -862,7 +862,7 @@ TEST(IntegerTest, IntegerSaturatingAbs) {
   ASSERT_EQ(min_num.saturating_abs(), Integer(Int32::MAX));
 }
 
-TEST(IntegerTest, IntegerSaturatingAbsNoSizeEffects) {
+TEST(IntegerTest, IntegerSaturatingAbsNoSideEffects) {
   Int32 num = 10_i32;
   Int32 tmp_num = num;
   ASSERT_EQ(num, tmp_num);
@@ -888,7 +888,7 @@ TEST(IntegerTest, IntegerCheckedAbs) {
   ASSERT_EQ(min_num.checked_abs(), std::nullopt);
 }
 
-TEST(IntegerTest, IntegerCheckedAbsNoSizeEffects) {
+TEST(IntegerTest, IntegerCheckedAbsNoSideEffects) {
   Int32 num = 10_i32;
   Int32 tmp_num = num;
   ASSERT_EQ(num, tmp_num);
@@ -914,7 +914,7 @@ TEST(IntegerTest, IntegerWrappingAbs) {
   ASSERT_EQ(min_num.wrapping_abs(), Int32(Int32::MIN));
 }
 
-TEST(IntegerTest, IntegerWrappingAbsNoSizeEffects) {
+TEST(IntegerTest, IntegerWrappingAbsNoSideEffects) {
   Int32 num = 10_i32;
   Int32 tmp_num = num;
   ASSERT_EQ(num, tmp_num);
@@ -940,7 +940,7 @@ TEST(IntegerTest, IntegerNeg) {
   ASSERT_THROW(-min_num, std::runtime_error);
 }
 
-TEST(IntegerTest, IntegerNegNoSizeEffects) {
+TEST(IntegerTest, IntegerNegNoSideEffects) {
   Int32 num = 10_i32;
   Int32 tmp_num = num;
   ASSERT_EQ(num, tmp_num);
@@ -966,7 +966,7 @@ TEST(IntegerTest, IntegerCheckedNeg) {
   ASSERT_EQ(min_num.checked_neg(), std::nullopt);
 }
 
-TEST(IntegerTest, IntegerCheckedNegNoSizeEffects) {
+TEST(IntegerTest, IntegerCheckedNegNoSideEffects) {
   Int32 num = 10_i32;
   Int32 tmp_num = num;
   ASSERT_EQ(num, tmp_num);
@@ -1000,7 +1000,7 @@ TEST(IntegerTest, IntegerOverflowingNeg) {
   ASSERT_EQ(ret, min_num);
 }
 
-TEST(IntegerTest, IntegerOverflowingNegNoSizeEffects) {
+TEST(IntegerTest, IntegerOverflowingNegNoSideEffects) {
   Int32 num = 10_i32;
   Int32 tmp_num = num;
   ASSERT_EQ(num, tmp_num);
@@ -1026,7 +1026,7 @@ TEST(IntegerTest, IntegerWrappingNeg) {
   ASSERT_EQ(min_num.wrapping_neg(), min_num);
 }
 
-TEST(IntegerTest, IntegerWrappingNegNoSizeEffects) {
+TEST(IntegerTest, IntegerWrappingNegNoSideEffects) {
   Int32 num = 10_i32;
   Int32 tmp_num = num;
   ASSERT_EQ(num, tmp_num);
@@ -1052,7 +1052,7 @@ TEST(IntegerTest, IntegerSaturatingNeg) {
   ASSERT_EQ(min_num.saturating_neg(), max_num);
 }
 
-TEST(IntegerTest, IntegerSaturatingNegNoSizeEffects) {
+TEST(IntegerTest, IntegerSaturatingNegNoSideEffects) {
   Int32 num = 10_i32;
   Int32 tmp_num = num;
   ASSERT_EQ(num, tmp_num);
