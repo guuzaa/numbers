@@ -137,6 +137,41 @@ class Integer {
     return Integer(num_ * other.num_);
   }
 
+  constexpr Integer abs() noexcept(false) {
+    if (num_ == MIN) {
+      throw std::runtime_error("abs overflow");
+    }
+    return Integer(is_positive(num_) ? num_ : -num_);
+  }
+
+  constexpr std::optional<Integer> checked_abs() noexcept {
+    if (num_ == MIN) {
+      return {};
+    }
+    return Integer(is_positive(num_) ? num_ : -num_);
+  }
+
+  constexpr std::tuple<Integer, bool> overflowing_abs() noexcept {
+    if (num_ == MIN) {
+      return {Integer(MIN), true};
+    }
+    return {Integer(is_positive(num_) ? num_ : -num_), false};
+  }
+
+  constexpr Integer wrapping_abs() noexcept {
+    if (num_ == MIN) {
+      return Integer(MIN);
+    }
+    return Integer(is_positive(num_) ? num_ : -num_);
+  }
+
+  constexpr Integer saturating_abs() noexcept {
+    if (num_ == MIN) {
+      return Integer(MAX);
+    }
+    return Integer(is_positive(num_) ? num_ : -num_);
+  }
+
   constexpr bool operator==(const Integer<T> &other) const { return num_ == other.num_; }
   constexpr bool operator==(const T &other) const { return num_ == other; }
 
