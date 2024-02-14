@@ -1,0 +1,41 @@
+name: CMake CI Matrix
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    name: Build and Test on ${{ matrix.os }} with ${{ matrix.compiler }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        include:
+          - os: ubuntu-latest
+            compiler: GCC
+            install: sudo apt-get update && sudo apt-get install -y build-essential
+            build-dir: build-gcc
+          - os: macos-latest
+            compiler: Clang
+            install: ""
+            build-dir: build-clang
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install dependencies
+      run: ${{ matrix.install }}
+    - name: Configure
+      run: |
+        mkdir ${{ matrix.build-dir }} && cd ${{ matrix.build-dir }}
+        cmake ..
+    - name: Build
+      run: |
+        cd ${{ matrix.build-dir }}
+        make -j6
+    - name: Test
+      run: |
+        cd ${{ matrix.build-dir }}
+        make run-tests
