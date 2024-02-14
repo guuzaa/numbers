@@ -6,7 +6,7 @@
 #include <optional>
 #include <type_traits>
 
-template <typename T, typename = std::enable_if_t<std::is_signed<T>::value>>
+template <typename T, typename = std::enable_if_t<std::is_signed_v<T>>>
 class Integer {
  public:
   constexpr static T MIN = std::numeric_limits<T>::min();
@@ -267,18 +267,5 @@ class Integer {
 
   T num_;
 };
-
-using Int8 = Integer<int8_t>;
-using Int16 = Integer<int16_t>;
-using Int32 = Integer<int32_t>;
-using Int64 = Integer<int64_t>;
-
-Integer<int8_t> operator"" _i8(unsigned long long val) { return Integer<int8_t>(val); }
-
-Integer<int16_t> operator"" _i16(unsigned long long val) { return Integer<int16_t>(val); }
-
-Integer<int32_t> operator"" _i32(unsigned long long val) { return Integer<int32_t>(val); }
-
-Integer<int64_t> operator"" _i64(unsigned long long val) { return Integer<int64_t>(val); }
 
 #endif
