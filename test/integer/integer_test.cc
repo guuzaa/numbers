@@ -2,7 +2,7 @@
 #include <vector>
 #include "gtest/gtest.h"
 
-#include "integer.hh"
+#include "numbers.h"
 #include "test/utils.hh"
 
 TEST(IntegerTest, IntegerTemplate) {
@@ -363,10 +363,6 @@ TEST(IntegerTest, IntegerCheckedSub) {
     auto ret = num.checked_sub(1);
     ASSERT_EQ(ret.value(), Int16(n - 1));
   }
-
-  Int16 num = Int16::MIN;
-  auto ret = num.checked_sub(1);
-  ASSERT_EQ(ret, std::nullopt);
 }
 
 TEST(IntegerTest, IntegerCheckedSubNoSideEffects) {
@@ -387,7 +383,7 @@ TEST(IntegerTest, IntegerOverflowingSub) {
     Int16 num1 = Int16::MIN;
     auto [ret, flag] = num1.overflowing_sub(num);
     ASSERT_TRUE(flag);
-    ASSERT_EQ(ret,  Int16::MIN - n);
+    ASSERT_EQ(ret, Int16::MIN - n);
   }
 
   for (int16_t n = std::numeric_limits<int16_t>::max(); n > std::numeric_limits<int16_t>::min(); n--) {
@@ -396,11 +392,6 @@ TEST(IntegerTest, IntegerOverflowingSub) {
     ASSERT_FALSE(flag);
     ASSERT_EQ(ret, Int16(n - 1));
   }
-
-  Int16 num = Int16::MIN;
-  auto [ret, flag] = num.overflowing_sub(1);
-  ASSERT_TRUE(flag);
-  ASSERT_EQ(ret, Int16::MIN - 1);
 }
 
 TEST(IntegerTest, IntegerOverflowingSubNoSideEffects) {

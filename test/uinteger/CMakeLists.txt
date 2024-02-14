@@ -8,7 +8,7 @@ add_executable(
         ${test_files}
 )
 
-target_link_libraries(${PROJECT_NAME} PRIVATE gtest gmock_main)
+target_link_libraries(${PROJECT_NAME} PRIVATE test_utils gtest gmock_main)
 
 gtest_discover_tests(${PROJECT_NAME}
         EXTRA_ARGS

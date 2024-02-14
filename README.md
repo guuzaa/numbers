@@ -12,7 +12,7 @@ numbers
 
 - **Signed Integers**: Int8 Int16 Int32 Int64
 
-- **Unsigned Integers**: Uint8 Uint16 Uint32 Uint64 (not support yet)
+- **Unsigned Integers**: Uint8 Uint16 Uint32 Uint64
 
 ## How to use
 
