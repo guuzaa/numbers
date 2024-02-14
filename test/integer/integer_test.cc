@@ -17,6 +17,13 @@ TEST(IntegerTest, IntegerTemplate) {
   Integer<char> test8 = 0;
 }
 
+TEST(IntegerTest, IntegerMinMax) {
+  ASSERT_THROW(-Int64::MIN, std::runtime_error);
+  ASSERT_EQ(Int16::MIN.saturating_neg(), Int16::MAX);
+  ASSERT_EQ(Int16::MAX.saturating_add(Int16::MAX), Int16::MAX);
+  ASSERT_EQ(Int16::MAX.saturating_sub(Int16::MAX), 0_i16);
+}
+
 TEST(IntegerTest, IntegerStringStream) {
   for (short n = 1; n < 1000; n++) {
     Int16 num = n;
@@ -55,7 +62,7 @@ TEST(IntegerTest, IntegerAddNoSideEffects) {
   ASSERT_EQ(num1, num);
   ASSERT_EQ(num2, num);
 
-  ASSERT_EQ(num2 + num1, Int32(20));
+  ASSERT_EQ(num2 + num1, 20_i32);
   ASSERT_EQ(num1, num);
   ASSERT_EQ(num2, num);
 }
@@ -66,7 +73,7 @@ TEST(IntegerTest, IntegerWrappingAdd) {
     ASSERT_EQ(num.wrapping_add(1), Int16(n + 1));
   }
   Int16 num = Int16::MAX;
-  ASSERT_EQ(num.wrapping_add(1), Int16(Int16::MIN));
+  ASSERT_EQ(num.wrapping_add(1), Int16::MIN);
 
   constexpr int32_t min = 10;
   constexpr int32_t max = 90000;
@@ -164,10 +171,10 @@ TEST(IntegerTest, IntegerOverflowingAdd) {
 
   {
     auto num = 10_i16;
-    Integer<short> num1 = Integer<short>::MAX;
+    Int16 num1 = Int16::MAX;
     auto [ret, flag] = num.overflowing_add(num1);
     ASSERT_TRUE(flag);
-    ASSERT_EQ(ret, 10 + Integer<short>::MAX);
+    ASSERT_EQ(ret, 10 + std::numeric_limits<int16_t>::max());
   }
 
   {
@@ -226,7 +233,7 @@ TEST(IntegerTest, IntegerSaturatingAdd) {
   for (int8_t i = 1; i < std::numeric_limits<int8_t>::max(); i++) {
     Int8 num = Int8::MAX;
     auto ret = num.saturating_add(Int8(i));
-    EXPECT_EQ(ret, Int8(Int8::MAX)) << static_cast<int>(i) << '\n';
+    EXPECT_EQ(ret, Int8::MAX) << static_cast<int>(i) << '\n';
   }
 
   {
@@ -254,8 +261,8 @@ TEST(IntegerTest, IntegerSaturatingAdd) {
   }
 
   {
-    Integer<long> num = -1;
-    Integer<long> num1 = Integer<long>::MIN;
+    Int64 num = -1;
+    Int64 num1 = Int64::MIN;
     auto ret = num.saturating_add(num1);
     ASSERT_EQ(ret, Int64::MIN);
   }
@@ -297,7 +304,7 @@ TEST(IntegerTest, IntegerAddOverflow) {
 TEST(IntegerTest, IntegerAddOverflowByAccumulate) {
   std::vector<Int64> nums(10);
   ASSERT_EQ(nums.size(), 10);
-  std::iota(nums.begin(), nums.end(), Int64(Int64::MAX - 11));
+  std::iota(nums.begin(), nums.end(), Int64::MAX - 11_i64);
   ASSERT_THROW(std::accumulate(nums.begin(), nums.end(), 0_i64), std::runtime_error);
 }
 
@@ -314,7 +321,7 @@ TEST(IntegerTest, IntegerSub) {
 
   {
     Int64 num = -1;
-    Int64 num1 = Integer<long>::MIN;
+    Int64 num1 = Int64::MIN;
     ASSERT_EQ(num - num1, Int64::MAX);
   }
 
@@ -383,7 +390,7 @@ TEST(IntegerTest, IntegerOverflowingSub) {
     Int16 num1 = Int16::MIN;
     auto [ret, flag] = num1.overflowing_sub(num);
     ASSERT_TRUE(flag);
-    ASSERT_EQ(ret, Int16::MIN - n);
+    ASSERT_EQ(ret, std::numeric_limits<int16_t>::min() - n);
   }
 
   for (int16_t n = std::numeric_limits<int16_t>::max(); n > std::numeric_limits<int16_t>::min(); n--) {
@@ -414,7 +421,7 @@ TEST(IntegerTest, IntegerWrappingSub) {
     ASSERT_EQ(num.wrapping_sub(1), Int16(n - 1));
   }
   Int16 num = Int16::MIN;
-  ASSERT_EQ(num.wrapping_sub(1), Int16(Int16::MAX));
+  ASSERT_EQ(num.wrapping_sub(1), Int16::MAX);
 }
 
 TEST(IntegerTest, IntegerWarppingSubNoSideEffects) {
@@ -729,7 +736,7 @@ TEST(IntegerTest, IntegerOverflowingDiv) {
   Int8 num1 = Int8::MIN;
   auto [ret, flag] = num1.overflowing_div(num);
   ASSERT_TRUE(flag);
-  ASSERT_EQ(ret, -1 * Int8::MIN);
+  ASSERT_EQ(ret, -1 * std::numeric_limits<int8_t>::min());
 }
 
 TEST(IntegerTest, IntegerOverflowingDivNoSideEffects) {
@@ -850,7 +857,7 @@ TEST(IntegerTest, IntegerSaturatingAbs) {
   Int32 max_num = Int32::MAX;
   ASSERT_EQ(max_num.saturating_abs(), max_num);
   Int32 min_num = Int32::MIN;
-  ASSERT_EQ(min_num.saturating_abs(), Integer(Int32::MAX));
+  ASSERT_EQ(min_num.saturating_abs(), Int32::MAX);
 }
 
 TEST(IntegerTest, IntegerSaturatingAbsNoSideEffects) {
@@ -902,7 +909,7 @@ TEST(IntegerTest, IntegerWrappingAbs) {
   Int32 max_num = Int32::MAX;
   ASSERT_EQ(max_num.wrapping_abs(), max_num);
   Int32 min_num = Int32::MIN;
-  ASSERT_EQ(min_num.wrapping_abs(), Int32(Int32::MIN));
+  ASSERT_EQ(min_num.wrapping_abs(), Int32::MIN);
 }
 
 TEST(IntegerTest, IntegerWrappingAbsNoSideEffects) {
@@ -926,7 +933,7 @@ TEST(IntegerTest, IntegerNeg) {
   }
 
   Int32 max_num = Int32::MAX;
-  ASSERT_EQ(-max_num, Int32(-Int32::MAX));
+  ASSERT_EQ(-max_num, -Int32::MAX);
   Int32 min_num = Int32::MIN;
   ASSERT_THROW(-min_num, std::runtime_error);
 }

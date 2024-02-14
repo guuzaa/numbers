@@ -8,12 +8,16 @@
 
 template <typename T, typename = std::enable_if_t<std::is_signed_v<T>>>
 class Integer {
- public:
-  constexpr static T MIN = std::numeric_limits<T>::min();
-  constexpr static T MAX = std::numeric_limits<T>::max();
+ private:
+  constexpr static T min_ = std::numeric_limits<T>::min();
+  constexpr static T max_ = std::numeric_limits<T>::max();
 
-  Integer() noexcept : num_{} {}
-  Integer(T num) noexcept : num_{num} {}
+ public:
+  inline static Integer<T> MIN = Integer<T>(min_);
+  inline static Integer<T> MAX = Integer<T>(max_);
+
+  constexpr Integer() noexcept : num_{} {}
+  constexpr Integer(T num) noexcept : num_{num} {}
 
   constexpr Integer operator+(const Integer<T> &other) noexcept(false) {
     if (add_overflow(num_, other.num_)) {
@@ -126,71 +130,71 @@ class Integer {
   }
 
   constexpr Integer abs() noexcept(false) {
-    if (num_ == MIN) {
+    if (num_ == min_) {
       throw std::runtime_error("abs overflow");
     }
     return Integer(is_positive(num_) ? num_ : -num_);
   }
 
   constexpr std::optional<Integer> checked_abs() noexcept {
-    if (num_ == MIN) {
+    if (num_ == min_) {
       return {};
     }
     return Integer(is_positive(num_) ? num_ : -num_);
   }
 
   constexpr std::tuple<Integer, bool> overflowing_abs() noexcept {
-    if (num_ == MIN) {
-      return {Integer(MIN), true};
+    if (num_ == min_) {
+      return {MIN, true};
     }
     return {Integer(is_positive(num_) ? num_ : -num_), false};
   }
 
   constexpr Integer wrapping_abs() noexcept {
-    if (num_ == MIN) {
-      return Integer(MIN);
+    if (num_ == min_) {
+      return MIN;
     }
     return Integer(is_positive(num_) ? num_ : -num_);
   }
 
   constexpr Integer saturating_abs() noexcept {
-    if (num_ == MIN) {
-      return Integer(MAX);
+    if (num_ == min_) {
+      return MAX;
     }
     return Integer(is_positive(num_) ? num_ : -num_);
   }
 
   constexpr Integer operator-() const noexcept(false) {
-    if (num_ == MIN) {
+    if (num_ == min_) {
       throw std::runtime_error("neg overflow");
     }
     return Integer(-num_);
   }
 
   constexpr std::optional<Integer> checked_neg() noexcept {
-    if (num_ == MIN) {
+    if (num_ == min_) {
       return {};
     }
     return Integer(-num_);
   }
 
   constexpr std::tuple<Integer, bool> overflowing_neg() noexcept {
-    if (num_ == MIN) {
-      return {Integer(MIN), true};
+    if (num_ == min_) {
+      return {MIN, true};
     }
     return {Integer(-num_), false};
   }
 
   constexpr Integer wrapping_neg() noexcept {
-    if (num_ == MIN) {
-      return Integer(MIN);
+    if (num_ == min_) {
+      return MIN;
     }
     return Integer(-num_);
   }
 
   constexpr Integer saturating_neg() noexcept {
-    if (num_ == MIN) {
-      return Integer(MAX);
+    if (num_ == min_) {
+      return MAX;
     }
     return Integer(-num_);
   }
@@ -254,7 +258,7 @@ class Integer {
     return !has_same_signal(minuend, minuend - subtrahend);
   }
 
-  constexpr bool div_overflow(T a, T b) const { return a == MIN && b == -1; }
+  constexpr bool div_overflow(T a, T b) const { return a == min_ && b == -1; }
 
   constexpr bool mul_overflow(T a, T b) const {
     T res;

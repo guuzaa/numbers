@@ -17,6 +17,12 @@ TEST(UintegerTest, UintegerTemplate) {
   Uinteger<unsigned char> test8 = 0;
 }
 
+TEST(UintegerTest, UintegerMinMax) {
+  ASSERT_THROW(-Uint64::MAX, std::runtime_error);
+  ASSERT_EQ(-Uint16::MIN, Uint16::MIN);
+  ASSERT_EQ(Uint16::MAX.saturating_add(Uint16::MAX), Uint16::MAX);
+}
+
 TEST(UintegerTest, UintegerStringStream) {
   for (unsigned short n = 0; n <= 1000; n++) {
     Uint16 num = n;
@@ -153,7 +159,7 @@ TEST(UintegerTest, UintegerOverflowingAdd) {
     Uinteger<unsigned short> num1 = Uinteger<unsigned short>::MAX;
     auto [ret, flag] = num.overflowing_add(num1);
     ASSERT_TRUE(flag);
-    ASSERT_EQ(ret, 10 + Uinteger<unsigned short>::MAX);
+    ASSERT_EQ(ret, 10 + std::numeric_limits<unsigned short>::max());
   }
 
   {
@@ -330,14 +336,14 @@ TEST(UintegerTest, UintegerOverflowingSub) {
     Uint16 num1 = Uint16::MIN;
     auto [ret, flag] = num1.overflowing_sub(num);
     ASSERT_TRUE(flag);
-    ASSERT_EQ(ret, Uint16::MIN - n);
+    ASSERT_EQ(ret, std::numeric_limits<uint16_t>::min() - n);
   }
 
   for (uint16_t n = std::numeric_limits<uint16_t>::max(); n > std::numeric_limits<uint16_t>::min(); n--) {
     Uint16 num = n;
     auto [ret, flag] = num.overflowing_sub(1);
     ASSERT_FALSE(flag);
-    ASSERT_EQ(ret, Uint16(n - 1));
+    ASSERT_EQ(ret, n - 1);
   }
 }
 
@@ -694,7 +700,7 @@ TEST(UintegerTest, UintegerCheckedNeg) {
     ASSERT_EQ(num.checked_neg(), std::nullopt);
   }
 
-  Int32 min_num = Uint32::MIN;
+  Uint32 min_num = Uint32::MIN;
   ASSERT_EQ(min_num.checked_neg(), min_num);
 }
 
@@ -718,7 +724,7 @@ TEST(UintegerTest, UintegerOverflowingNeg) {
   Uint32 max_num = Uint32::MAX;
   auto [ret, flag] = max_num.overflowing_neg();
   ASSERT_TRUE(flag);
-  ASSERT_EQ(ret, -Uint32::MAX);
+  ASSERT_EQ(ret, -std::numeric_limits<uint32_t>::max());
   Uint32 min_num = Uint32::MIN;
   std::tie(ret, flag) = min_num.overflowing_neg();
   ASSERT_FALSE(flag);
@@ -741,7 +747,7 @@ TEST(UintegerTest, UintegerWrappingNeg) {
   }
 
   Uint32 max_num = Uint32::MAX;
-  ASSERT_EQ(max_num.wrapping_neg(), -Uint32::MAX);
+  ASSERT_EQ(max_num.wrapping_neg(), -std::numeric_limits<uint32_t>::max());
   Uint32 min_num = Uint32::MIN;
   ASSERT_EQ(min_num.wrapping_neg(), min_num);
 }
