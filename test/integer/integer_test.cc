@@ -119,7 +119,7 @@ TEST(IntegerTest, IntegerCheckedAdd) {
 
   {
     auto num = 10_i64;
-    Integer<long> num1 = Integer<long>::MAX;
+    Int64 num1 = Int64::MAX;
     ASSERT_EQ(num.checked_add(num1), std::nullopt);
   }
 
@@ -172,7 +172,7 @@ TEST(IntegerTest, IntegerOverflowingAdd) {
 
   {
     auto num = 10_i64;
-    Integer<long> num1 = Integer<long>::MAX;
+    Int64 num1 = Int64::MAX;
     auto [_, flag] = num.overflowing_add(num1);
     ASSERT_TRUE(flag);
   }
@@ -238,7 +238,7 @@ TEST(IntegerTest, IntegerSaturatingAdd) {
 
   {
     auto num = 10_i64;
-    Integer<long> num1 = Integer<long>::MAX;
+    Int64 num1 = Int64::MAX;
     auto ret = num.saturating_add(num1);
     ASSERT_EQ(ret, Int64::MAX);
   }
@@ -283,7 +283,7 @@ TEST(IntegerTest, IntegerAddOverflow) {
 
   {
     auto num = 10_i64;
-    Integer<long> num1 = Integer<long>::MAX;
+    Int64 num1 = Int64::MAX;
     ASSERT_THROW(num + num1, std::runtime_error);
   }
 
