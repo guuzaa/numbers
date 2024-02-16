@@ -34,7 +34,7 @@ jobs:
     - name: Build
       run: |
         cd ${{ matrix.build-dir }}
-        make -j6
+        make -j
     - name: Example
       run: |
         cd ${{ matrix.build-dir }}
