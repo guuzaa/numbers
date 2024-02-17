@@ -8,12 +8,16 @@
 
 template <typename T, typename = std::enable_if_t<std::is_unsigned_v<T>>>
 class Uinteger {
- public:
-  constexpr static T MIN = std::numeric_limits<T>::min();
-  constexpr static T MAX = std::numeric_limits<T>::max();
+ private:
+  constexpr static T min_ = std::numeric_limits<T>::min();
+  constexpr static T max_ = std::numeric_limits<T>::max();
 
-  Uinteger() noexcept : num_{} {}
-  Uinteger(T num) noexcept : num_{num} {}
+ public:
+  inline static Uinteger<T> MIN = Uinteger(min_);
+  inline static Uinteger<T> MAX = Uinteger(max_);
+
+  constexpr Uinteger() noexcept : num_{} {}
+  constexpr Uinteger(T num) noexcept : num_{num} {}
 
   constexpr Uinteger operator+(const Uinteger<T> &other) noexcept(false) {
     if (add_overflow(num_, other.num_)) {
@@ -124,29 +128,29 @@ class Uinteger {
   }
 
   constexpr Uinteger operator-() const noexcept(false) {
-    if (num_ == MIN) {
+    if (num_ == min_) {
       return Uinteger(num_);
     }
     throw std::runtime_error("neg overflow");
   }
 
   constexpr std::optional<Uinteger> checked_neg() noexcept {
-    if (num_ == MIN) {
-      return Uinteger(MIN);
+    if (num_ == min_) {
+      return MIN;
     }
     return {};
   }
 
   constexpr std::tuple<Uinteger, bool> overflowing_neg() noexcept {
-    if (num_ == MIN) {
-      return {Uinteger(MIN), false};
+    if (num_ == min_) {
+      return {MIN, false};
     }
     return {Uinteger(-num_), true};
   }
 
   constexpr Uinteger wrapping_neg() noexcept {
-    if (num_ == MIN) {
-      return Uinteger(MIN);
+    if (num_ == min_) {
+      return MIN;
     }
     return Uinteger(-num_);
   }
@@ -192,7 +196,7 @@ class Uinteger {
   }
 
  private:
-  constexpr bool add_overflow(T a, T b) const { return b > MAX - a; }
+  constexpr bool add_overflow(T a, T b) const { return b > max_ - a; }
 
   constexpr bool sub_overflow(T minuend, T subtrahend) const { return minuend < subtrahend; }
 
