@@ -19,108 +19,108 @@ class Uinteger {
   constexpr Uinteger() noexcept : num_{} {}
   constexpr Uinteger(T num) noexcept : num_{num} {}
 
-  constexpr Uinteger operator+(const Uinteger<T> &other) noexcept(false) {
+  constexpr Uinteger operator+(const Uinteger<T> &other) const noexcept(false) {
     if (add_overflow(num_, other.num_)) {
       throw std::runtime_error("add overflow");
     }
     return Uinteger(num_ + other.num_);
   }
 
-  constexpr Uinteger wrapping_add(const Uinteger<T> &other) noexcept { return Uinteger(num_ + other.num_); }
+  constexpr Uinteger wrapping_add(const Uinteger<T> &other) const noexcept { return Uinteger(num_ + other.num_); }
 
-  constexpr std::optional<Uinteger> checked_add(const Uinteger<T> &other) noexcept {
+  constexpr std::optional<Uinteger> checked_add(const Uinteger<T> &other) const noexcept {
     if (add_overflow(num_, other.num_)) {
       return {};
     }
     return Uinteger(num_ + other.num_);
   }
 
-  constexpr std::tuple<Uinteger<T>, bool> overflowing_add(const Uinteger<T> &other) noexcept {
+  constexpr std::tuple<Uinteger<T>, bool> overflowing_add(const Uinteger<T> &other) const noexcept {
     return {Uinteger(num_ + other.num_), add_overflow(num_, other.num_)};
   }
 
-  constexpr Uinteger<T> saturating_add(const Uinteger<T> &other) noexcept {
+  constexpr Uinteger<T> saturating_add(const Uinteger<T> &other) const noexcept {
     if (add_overflow(num_, other.num_)) {
       return Uinteger(MAX);
     }
     return Uinteger(num_ + other.num_);
   }
 
-  constexpr Uinteger operator-(const Uinteger<T> &other) noexcept(false) {
+  constexpr Uinteger operator-(const Uinteger<T> &other) const noexcept(false) {
     if (sub_overflow(num_, other.num_)) {
       throw std::runtime_error("sub overflow");
     }
     return Uinteger(num_ - other.num_);
   }
 
-  constexpr Uinteger wrapping_sub(const Uinteger<T> &other) noexcept { return Uinteger(num_ - other.num_); }
+  constexpr Uinteger wrapping_sub(const Uinteger<T> &other) const noexcept { return Uinteger(num_ - other.num_); }
 
-  constexpr std::optional<Uinteger> checked_sub(const Uinteger<T> &other) noexcept {
+  constexpr std::optional<Uinteger> checked_sub(const Uinteger<T> &other) const noexcept {
     if (sub_overflow(num_, other.num_)) {
       return {};
     }
     return Uinteger(num_ - other.num_);
   }
 
-  constexpr std::tuple<Uinteger<T>, bool> overflowing_sub(const Uinteger<T> &other) noexcept {
+  constexpr std::tuple<Uinteger<T>, bool> overflowing_sub(const Uinteger<T> &other) const noexcept {
     return {Uinteger(num_ - other.num_), sub_overflow(num_, other.num_)};
   }
 
-  constexpr Uinteger saturating_sub(const Uinteger<T> &other) noexcept {
+  constexpr Uinteger saturating_sub(const Uinteger<T> &other) const noexcept {
     if (sub_overflow(num_, other.num_)) {
       return MIN;
     }
     return Uinteger(num_ - other.num_);
   }
 
-  constexpr Uinteger operator/(const Uinteger<T> &other) {
+  constexpr Uinteger operator/(const Uinteger<T> &other) const noexcept(false) {
     if (div_overflow(num_, other.num_)) {
       throw std::runtime_error("div overflow");
     }
     return Uinteger(num_ / other.num_);
   }
 
-  constexpr Uinteger wrapping_div(const Uinteger<T> &other) noexcept(false) { return Uinteger(num_ / other.num_); }
+  constexpr Uinteger wrapping_div(const Uinteger<T> &other) const noexcept { return Uinteger(num_ / other.num_); }
 
-  constexpr std::optional<Uinteger> checked_div(const Uinteger<T> &other) noexcept {
+  constexpr std::optional<Uinteger> checked_div(const Uinteger<T> &other) const noexcept {
     if (div_overflow(num_, other.num_)) {
       return {};
     }
     return Uinteger(num_ / other.num_);
   }
 
-  constexpr std::tuple<Uinteger<T>, bool> overflowing_div(const Uinteger<T> &other) noexcept {
+  constexpr std::tuple<Uinteger<T>, bool> overflowing_div(const Uinteger<T> &other) const noexcept {
     return {Uinteger(num_ / other.num_), div_overflow(num_, other.num_)};
   }
 
-  constexpr Uinteger saturating_div(const Uinteger<T> &other) noexcept {
+  constexpr Uinteger saturating_div(const Uinteger<T> &other) const noexcept {
     if (div_overflow(num_, other.num_)) {
       return MIN;
     }
     return Uinteger(num_ / other.num_);
   }
 
-  constexpr Uinteger operator*(const Uinteger<T> &other) {
+  constexpr Uinteger operator*(const Uinteger<T> &other) const noexcept(false) {
     if (mul_overflow(num_, other.num_)) {
       throw std::runtime_error("mul overflow");
     }
     return Uinteger(num_ * other.num_);
   }
 
-  constexpr Uinteger wrapping_mul(const Uinteger<T> &other) noexcept(false) { return Uinteger(num_ * other.num_); }
+  constexpr Uinteger wrapping_mul(const Uinteger<T> &other) const noexcept { return Uinteger(num_ * other.num_); }
 
-  constexpr std::optional<Uinteger> checked_mul(const Uinteger<T> &other) noexcept {
+  constexpr std::optional<Uinteger> checked_mul(const Uinteger<T> &other) const noexcept {
     if (mul_overflow(num_, other.num_)) {
       return {};
     }
     return Uinteger(num_ * other.num_);
   }
 
-  constexpr std::tuple<Uinteger<T>, bool> overflowing_mul(const Uinteger<T> &other) noexcept {
+  constexpr std::tuple<Uinteger<T>, bool> overflowing_mul(const Uinteger<T> &other) const noexcept {
     return {Uinteger(num_ * other.num_), mul_overflow(num_, other.num_)};
   }
 
-  constexpr Uinteger saturating_mul(const Uinteger<T> &other) noexcept {
+  constexpr Uinteger saturating_mul(const Uinteger<T> &other) const noexcept {
     if (mul_overflow(num_, other.num_)) {
       return MAX;
     }
@@ -134,38 +134,38 @@ class Uinteger {
     throw std::runtime_error("neg overflow");
   }
 
-  constexpr std::optional<Uinteger> checked_neg() noexcept {
+  constexpr std::optional<Uinteger> checked_neg() const noexcept {
     if (num_ == min_) {
       return MIN;
     }
     return {};
   }
 
-  constexpr std::tuple<Uinteger, bool> overflowing_neg() noexcept {
+  constexpr std::tuple<Uinteger, bool> overflowing_neg() const noexcept {
     if (num_ == min_) {
       return {MIN, false};
     }
     return {Uinteger(-num_), true};
   }
 
-  constexpr Uinteger wrapping_neg() noexcept {
+  constexpr Uinteger wrapping_neg() const noexcept {
     if (num_ == min_) {
       return MIN;
     }
     return Uinteger(-num_);
   }
 
-  constexpr bool operator==(const Uinteger<T> &other) const { return num_ == other.num_; }
-  constexpr bool operator==(const T &other) const { return num_ == other; }
+  constexpr bool operator==(const Uinteger<T> &other) const noexcept { return num_ == other.num_; }
+  constexpr bool operator==(const T &other) const noexcept { return num_ == other; }
 
-  constexpr bool operator<(const Uinteger<T> &other) const { return num_ < other.num_; }
-  constexpr bool operator<(const T &other) const { return num_ < other; }
+  constexpr bool operator<(const Uinteger<T> &other) const noexcept { return num_ < other.num_; }
+  constexpr bool operator<(const T &other) const noexcept { return num_ < other; }
 
-  constexpr bool operator>(const Uinteger<T> &other) const { return num_ > other.num_; }
-  constexpr bool operator>(const T &other) const { return num_ > other; }
+  constexpr bool operator>(const Uinteger<T> &other) const noexcept { return num_ > other.num_; }
+  constexpr bool operator>(const T &other) const noexcept { return num_ > other; }
 
   // prefix ++
-  constexpr Uinteger &operator++() {
+  constexpr Uinteger &operator++() noexcept(false) {
     if (add_overflow(num_, 1)) {
       throw std::runtime_error("prefix ++ overflow");
     }
@@ -174,7 +174,7 @@ class Uinteger {
   }
 
   // postfix ++
-  constexpr Uinteger operator++(int) {
+  constexpr Uinteger operator++(int) noexcept(false) {
     if (add_overflow(num_, 1)) {
       throw std::runtime_error("postfix ++ overflow");
     }
@@ -188,7 +188,7 @@ class Uinteger {
     return Uinteger<U>(static_cast<U>(num_));
   }
 
-  explicit operator T() const { return num_; }
+  explicit operator T() const noexcept { return num_; }
 
   friend std::ostream &operator<<(std::ostream &os, const Uinteger<T> &num) {
     os << num.num_;
@@ -196,11 +196,11 @@ class Uinteger {
   }
 
  private:
-  constexpr bool add_overflow(T a, T b) const { return b > max_ - a; }
+  constexpr bool add_overflow(T a, T b) const noexcept { return b > max_ - a; }
 
-  constexpr bool sub_overflow(T minuend, T subtrahend) const { return minuend < subtrahend; }
+  constexpr bool sub_overflow(T minuend, T subtrahend) const noexcept { return minuend < subtrahend; }
 
-  constexpr bool div_overflow(T a, T b) const { return false; }
+  constexpr bool div_overflow(T a, T b) const noexcept { return false; }
 
   constexpr bool mul_overflow(T a, T b) const {
     T res;
@@ -209,5 +209,18 @@ class Uinteger {
 
   T num_;
 };
+
+using Uint8 = Uinteger<uint8_t>;
+using Uint16 = Uinteger<uint16_t>;
+using Uint32 = Uinteger<uint32_t>;
+using Uint64 = Uinteger<uint64_t>;
+
+constexpr Uint8 operator"" _u8(unsigned long long val) { return Uint8(val); }
+
+constexpr Uint16 operator"" _u16(unsigned long long val) { return Uint16(val); }
+
+constexpr Uint32 operator"" _u32(unsigned long long val) { return Uint32(val); }
+
+constexpr Uint64 operator"" _u64(unsigned long long val) { return Uint64(val); }
 
 #endif

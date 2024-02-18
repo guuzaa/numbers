@@ -2,7 +2,7 @@
 #include <vector>
 #include "gtest/gtest.h"
 
-#include "numbers.h"
+#include "integer.hh"
 #include "test/utils.hh"
 
 TEST(IntegerTest, IntegerTemplate) {
