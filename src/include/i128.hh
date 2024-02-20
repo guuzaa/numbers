@@ -1,6 +1,7 @@
 #ifndef HEADER_I128_HH
 #define HEADER_I128_HH
 #include <cstdint>
+#include <tuple>
 
 #include "uinteger.hh"
 
@@ -14,7 +15,7 @@ class Int128 {
   constexpr Int128 operator+(const Int128 &other) const noexcept {
     auto [low, flag] = this->low_.overflowing_add(other.low_);
     auto high = this->high_ + other.high_ + flag;
-    return Int128(high, low);
+    return Int128(high, low_.saturating_add(other.low_));
   }
 
   constexpr bool operator==(const Int128 &other) const noexcept {
