@@ -540,7 +540,7 @@ constexpr uint128 operator>>(uint128 lhs, int amount) {
 }
 
 namespace int128_internal {
-  // Returns the result of adding two uint128 values, with overflow detected.
+// Returns the result of adding two uint128 values, with overflow detected.
 constexpr uint128 AddResult(uint128 result, uint128 lhs) {
   return (Uint128Low64(result) < Uint128Low64(lhs)) ? MakeUint128(Uint128High64(result) + 1, Uint128Low64(result))
                                                     : result;
@@ -550,6 +550,231 @@ constexpr uint128 AddResult(uint128 result, uint128 lhs) {
 constexpr uint128 operator+(uint128 lhs, uint128 rhs) {
   return int128_internal::AddResult(
       MakeUint128(Uint128High64(lhs) + Uint128High64(rhs), Uint128Low64(lhs) + Uint128Low64(rhs)), lhs);
+}
+
+namespace int128_internal {
+constexpr uint128 SubtractResult(uint128 result, uint128 lhs, uint128 rhs) {
+  return (Uint128Low64(lhs) < Uint128Low64(rhs)) ? MakeUint128(Uint128High64(result) - 1, Uint128Low64(result))
+                                                 : result;
+}
+}  // namespace int128_internal
+
+constexpr uint128 operator-(uint128 lhs, uint128 rhs) {
+  return int128_internal::SubtractResult(
+      MakeUint128(Uint128High64(lhs) - Uint128High64(rhs), Uint128Low64(lhs) - Uint128Low64(rhs)), lhs);
+}
+
+inline uint128 operator*(uint128 lhs, uint128 rhs) {
+  uint64_t a32 = Uint128Low64(lhs) >> 32;
+  uint64_t a00 = Uint128Low64(lhs) & 0xffffffff;
+  uint64_t b32 = Uint128Low64(rhs) >> 32;
+  uint64_t b00 = Uint128Low64(rhs) & 0xffffffff;
+  uint128 result = MakeUint128(
+      Uint128High64(lhs) * Uint128Low64(rhs) + Uint128Low64(lhs) * Uint128High64(rhs) + a32 * b32, a00 * b00);
+  result += uint128(a32 * b00) << 32;
+  result += uint128(a00 * b32) << 32;
+  return result;
+}
+
+// TODO implement division and modulo
+
+// Increment/decrement operators
+inline uint128 uint128::operator++(int) {
+  uint128 tmp(*this);
+  *this += 1;
+  return tmp;
+}
+
+inline uint128 uint128::operator--(int) {
+  uint128 tmp(*this);
+  *this -= 1;
+  return tmp;
+}
+
+inline uint128 &uint128::operator++() {
+  *this += 1;
+  return *this;
+}
+
+inline uint128 &uint128::operator--() {
+  *this -= 1;
+  return *this;
+}
+
+constexpr int128 MakeInt128(int64_t high, uint64_t low) { return int128(high, low); }
+
+// Assignments from integer types.
+inline int128 &int128::operator=(int v) { return *this = int128(v); }
+
+inline int128 &int128::operator=(unsigned int v) { return *this = int128(v); }
+
+inline int128 &int128::operator=(long v) { return *this = int128(v); }
+
+inline int128 &int128::operator=(unsigned long v) { return *this = int128(v); }
+
+inline int128 &int128::operator=(long long v) { return *this = int128(v); }
+
+inline int128 &int128::operator=(unsigned long long v) { return *this = int128(v); }
+
+// Arithmetic operators.
+constexpr int128 operator-(int128 v);
+constexpr int128 operator+(int128 lhs, uint128 rhs);
+constexpr int128 operator-(int128 lhs, uint128 rhs);
+int128 operator*(int128 lhs, uint128 rhs);
+int128 operator/(int128 lhs, uint128 rhs);
+int128 operator%(int128 lhs, uint128 rhs);
+constexpr int128 operator|(int128 lhs, uint128 rhs);
+constexpr int128 operator&(int128 lhs, uint128 rhs);
+constexpr int128 operator^(int128 lhs, uint128 rhs);
+constexpr int128 operator<<(int128 lhs, uint128 rhs);
+constexpr int128 operator>>(int128 lhs, uint128 rhs);
+
+inline int128 &int128::operator+=(int128 other) {
+  *this = *this + other;
+  return *this;
+}
+
+inline int128 &int128::operator-=(int128 other) {
+  *this = *this - other;
+  return *this;
+}
+
+inline int128 &int128::operator*=(int128 other) {
+  *this = *this * other;
+  return *this;
+}
+
+inline int128 &int128::operator/=(int128 other) {
+  *this = *this / other;
+  return *this;
+}
+
+inline int128 &int128::operator%=(int128 other) {
+  *this = *this % other;
+  return *this;
+}
+
+inline int128 &int128::operator|=(int128 other) {
+  *this = *this | other;
+  return *this;
+}
+
+inline int128 &int128::operator&=(int128 other) {
+  *this = *this & other;
+  return *this;
+}
+
+inline int128 &int128::operator^=(int128 other) {
+  *this = *this ^ other;
+  return *this;
+}
+
+inline int128 &int128::operator<<=(int amount) {
+  *this = *this << amount;
+  return *this;
+}
+
+inline int128 &int128::operator>>=(int amount) {
+  *this = *this >> amount;
+  return *this;
+}
+
+// Forward declarations for comparison operators
+constexpr bool operator!=(int128 lhs, int128 rhs);
+
+// Casts from unsigned to signed while preserving the underlying binary representation.
+namespace int128_internal {
+constexpr int64_t BitCastToSigned(uint64_t v) {
+  return v & (uint64_t{1} << 63) ? ~static_cast<int64_t>(~v) : static_cast<int64_t>(v);
+}
+}  // namespace int128_internal
+
+constexpr int128::int128(int64_t high, uint64_t low) : lo_{low}, hi_{high} {}
+
+constexpr int128::int128(int v) : lo_{static_cast<uint64_t>(v)}, hi_{v < 0 ? ~int64_t{0} : 0} {}
+
+constexpr int128::int128(long v) : lo_{static_cast<uint64_t>(v)}, hi_{v < 0 ? ~int64_t{0} : 0} {}
+
+constexpr int128::int128(long long v) : lo_{static_cast<uint64_t>(v)}, hi_{v < 0 ? ~int64_t{0} : 0} {}
+
+constexpr int128::int128(unsigned int v) : lo_{v}, hi_{0} {}
+
+constexpr int128::int128(unsigned long v) : lo_{v}, hi_{0} {}
+
+constexpr int128::int128(unsigned long long v) : lo_{v}, hi_{0} {}
+
+constexpr int128::int128(uint128 v) : lo_{Uint128Low64(v)}, hi_{static_cast<int64_t>(Uint128High64(v))} {}
+
+constexpr int128::operator bool() const { return lo_ || hi_; }
+
+constexpr int128::operator char() const { return static_cast<char>(static_cast<long long>(*this)); }
+
+constexpr int128::operator signed char() const { return static_cast<signed char>(static_cast<long long>(*this)); }
+
+constexpr int128::operator unsigned char() const { return static_cast<unsigned char>(lo_); }
+
+constexpr int128::operator char16_t() const { return static_cast<char16_t>(lo_); }
+
+constexpr int128::operator char32_t() const { return static_cast<char32_t>(lo_); }
+
+constexpr int128::operator short() const { return static_cast<short>(static_cast<long long>(*this)); }
+
+constexpr int128::operator unsigned short() const { return static_cast<unsigned short>(lo_); }
+
+constexpr int128::operator int() const { return static_cast<int>(static_cast<long long>(*this)); }
+
+constexpr int128::operator unsigned int() const { return static_cast<unsigned int>(lo_); }
+
+constexpr int128::operator long() const { return static_cast<long>(static_cast<long long>(*this)); }
+
+constexpr int128::operator unsigned long() const { return static_cast<unsigned long>(lo_); }
+
+constexpr int128::operator long long() const { return int128_internal::BitCastToSigned(lo_); }
+
+constexpr int128::operator unsigned long long() const { return static_cast<unsigned long long>(lo_); }
+
+// Comparison operators
+constexpr bool operator==(int128 lhs, int128 rhs) {
+  return (Int128Low64(lhs) == Int128Low64(rhs) && Int128High64(lhs) == Int128High64(rhs));
+}
+
+constexpr bool operator!=(int128 lhs, int128 rhs) { return !(lhs == rhs); }
+
+constexpr bool operator<(int128 lhs, int128 rhs) {
+  return (Int128High64(lhs) == Int128High64(rhs)) ? (Int128Low64(lhs) < Int128Low64(rhs))
+                                                  : (Int128High64(lhs) < Int128High64(rhs));
+}
+
+constexpr bool operator>(int128 lhs, int128 rhs) {
+  return (Int128High64(lhs) == Int128High64(rhs)) ? (Int128Low64(lhs) > Int128Low64(rhs))
+                                                  : (Int128High64(lhs) > Int128High64(rhs));
+}
+
+constexpr bool operator<=(int128 lhs, int128 rhs) { return !(rhs > lhs); }
+
+constexpr bool operator>=(int128 lhs, int128 rhs) { return !(rhs < lhs); }
+
+// Unary operators
+
+constexpr int128 operator-(int128 v) {
+  return MakeInt128(~Int128High64(v) + (Int128Low64(v) == 0), ~Int128Low64(v) + 1);
+}
+
+constexpr int128 operator!(int128 v) { return !Int128High64(v) && !Int128Low64(v); }
+
+constexpr int128 operator~(int128 v) { return MakeInt128(~Int128High64(v), ~Int128Low64(v)); }
+
+// Arithmetic operators
+namespace int128_internal {
+constexpr int128 SignedAddResult(int128 result, int128 lhs) {
+  // check for carry
+  return (Int128Low64(result) < Int128Low64(lhs)) ? MakeInt128(Int128High64(result) + 1, Int128Low64(result)) : result;
+}
+}  // namespace int128_internal
+
+constexpr int128 operator+(int128 lhs, int128 rhs) {
+  return int128_internal::SignedAddResult(
+      MakeInt128(Int128High64(lhs) + Int128High64(rhs), Int128Low64(lhs) + Int128Low64(rhs)), lhs);
 }
 
 }  // namespace numbers
