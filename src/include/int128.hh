@@ -123,7 +123,7 @@ class uint128 {
   uint64_t hi_;
 };
 
-std::ostream &operator<<(std::ostream &os, uint128 v);
+// std::ostream &operator<<(std::ostream &os, uint128 v);
 
 constexpr uint128 Uint128Max() {
   return uint128((std::numeric_limits<uint64_t>::max)(), (std::numeric_limits<uint64_t>::max)());
@@ -285,7 +285,7 @@ class int128 {
   int64_t hi_;
 };
 
-std::ostream &operator<<(std::ostream &os, int128 v);
+// std::ostream &operator<<(std::ostream &os, int128 v);
 
 constexpr int128 Int128Max() {
   return int128((std::numeric_limits<int64_t>::max)(), (std::numeric_limits<uint64_t>::max)());
@@ -561,9 +561,10 @@ constexpr uint128 SubtractResult(uint128 result, uint128 lhs, uint128 rhs) {
 
 constexpr uint128 operator-(uint128 lhs, uint128 rhs) {
   return int128_internal::SubtractResult(
-      MakeUint128(Uint128High64(lhs) - Uint128High64(rhs), Uint128Low64(lhs) - Uint128Low64(rhs)), lhs);
+      MakeUint128(Uint128High64(lhs) - Uint128High64(rhs), Uint128Low64(lhs) - Uint128Low64(rhs)), lhs, rhs);
 }
 
+// Ref https://en.wikipedia.org/wiki/Karatsuba_algorithm
 inline uint128 operator*(uint128 lhs, uint128 rhs) {
   uint64_t a32 = Uint128Low64(lhs) >> 32;
   uint64_t a00 = Uint128Low64(lhs) & 0xffffffff;
@@ -618,16 +619,16 @@ inline int128 &int128::operator=(unsigned long long v) { return *this = int128(v
 
 // Arithmetic operators.
 constexpr int128 operator-(int128 v);
-constexpr int128 operator+(int128 lhs, uint128 rhs);
-constexpr int128 operator-(int128 lhs, uint128 rhs);
-int128 operator*(int128 lhs, uint128 rhs);
-int128 operator/(int128 lhs, uint128 rhs);
-int128 operator%(int128 lhs, uint128 rhs);
-constexpr int128 operator|(int128 lhs, uint128 rhs);
-constexpr int128 operator&(int128 lhs, uint128 rhs);
-constexpr int128 operator^(int128 lhs, uint128 rhs);
-constexpr int128 operator<<(int128 lhs, uint128 rhs);
-constexpr int128 operator>>(int128 lhs, uint128 rhs);
+constexpr int128 operator+(int128 lhs, int128 rhs);
+constexpr int128 operator-(int128 lhs, int128 rhs);
+int128 operator*(int128 lhs, int128 rhs);
+int128 operator/(int128 lhs, int128 rhs);
+int128 operator%(int128 lhs, int128 rhs);
+constexpr int128 operator|(int128 lhs, int128 rhs);
+constexpr int128 operator&(int128 lhs, int128 rhs);
+constexpr int128 operator^(int128 lhs, int128 rhs);
+constexpr int128 operator<<(int128 lhs, int amount);
+constexpr int128 operator>>(int128 lhs, int amount);
 
 inline int128 &int128::operator+=(int128 other) {
   *this = *this + other;
@@ -688,6 +689,10 @@ constexpr int64_t BitCastToSigned(uint64_t v) {
   return v & (uint64_t{1} << 63) ? ~static_cast<int64_t>(~v) : static_cast<int64_t>(v);
 }
 }  // namespace int128_internal
+
+constexpr uint64_t Int128Low64(int128 v) { return v.lo_; }
+
+constexpr int64_t Int128High64(int128 v) { return v.hi_; }
 
 constexpr int128::int128(int64_t high, uint64_t low) : lo_{low}, hi_{high} {}
 
@@ -755,7 +760,6 @@ constexpr bool operator<=(int128 lhs, int128 rhs) { return !(rhs > lhs); }
 constexpr bool operator>=(int128 lhs, int128 rhs) { return !(rhs < lhs); }
 
 // Unary operators
-
 constexpr int128 operator-(int128 v) {
   return MakeInt128(~Int128High64(v) + (Int128Low64(v) == 0), ~Int128Low64(v) + 1);
 }
@@ -775,6 +779,97 @@ constexpr int128 SignedAddResult(int128 result, int128 lhs) {
 constexpr int128 operator+(int128 lhs, int128 rhs) {
   return int128_internal::SignedAddResult(
       MakeInt128(Int128High64(lhs) + Int128High64(rhs), Int128Low64(lhs) + Int128Low64(rhs)), lhs);
+}
+
+namespace int128_internal {
+constexpr int128 SignedSubstructResult(int128 result, int128 lhs, int128 rhs) {
+  // check for carry
+  return (Int128Low64(lhs) < Int128Low64(rhs)) ? MakeInt128(Int128High64(result) - 1, Int128Low64(result)) : result;
+}
+}  // namespace int128_internal
+
+constexpr int128 operator-(int128 lhs, int128 rhs) {
+  return int128_internal::SignedSubstructResult(
+      MakeInt128(Int128High64(lhs) - Int128High64(rhs), Int128Low64(lhs) - Int128Low64(rhs)), lhs, rhs);
+}
+
+inline int128 operator*(int128 lhs, int128 rhs) {
+  return MakeInt128(int128_internal::BitCastToSigned(Uint128High64(uint128(lhs) * uint128(rhs))),
+                    Uint128Low64(uint128(lhs) * uint128(rhs)));
+}
+
+inline int128 int128::operator++(int) {
+  int128 tmp(*this);
+  *this += 1;
+  return tmp;
+}
+
+inline int128 int128::operator--(int) {
+  int128 tmp(*this);
+  *this -= 1;
+  return tmp;
+}
+
+inline int128 &int128::operator++() {
+  *this += 1;
+  return *this;
+}
+
+inline int128 &int128::operator--() {
+  *this -= 1;
+  return *this;
+}
+
+constexpr int128 operator|(int128 lhs, int128 rhs) {
+  return MakeInt128(Int128High64(lhs) | Int128High64(rhs), Int128Low64(lhs) | Int128Low64(rhs));
+}
+
+constexpr int128 operator&(int128 lhs, int128 rhs) {
+  return MakeInt128(Int128High64(lhs) & Int128High64(rhs), Int128Low64(lhs) & Int128Low64(rhs));
+}
+
+constexpr int128 operator^(int128 lhs, int128 rhs) {
+  return MakeInt128(Int128High64(lhs) ^ Int128High64(rhs), Int128Low64(lhs) ^ Int128Low64(rhs));
+}
+
+constexpr int128 operator<<(int128 lhs, int amount) {
+  // int64_t shifts of >= 63 are undefined, so we need some special-casing.
+  assert(amount >= 0 && amount < 127);
+
+  if (amount <= 0) {
+    return lhs;
+  } else if (amount < 63) {
+    return MakeInt128((Int128High64(lhs) << amount) | static_cast<int64_t>(Int128Low64(lhs) >> (64 - amount)),
+                      Int128Low64(lhs) << amount);
+  } else if (amount == 63) {
+    return MakeInt128(((Int128High64(lhs) << 32) << 31) | static_cast<int64_t>(Int128Low64(lhs) >> 1),
+                      (Int128Low64(lhs) << 32) << 31);
+  } else if (amount == 127) {
+    return MakeInt128(static_cast<int64_t>(Int128Low64(lhs) << 63), 0);
+  } else if (amount > 127) {
+    return MakeInt128(0, 0);
+  } else {  // amount >= 64 && amount < 127
+    return MakeInt128(static_cast<int64_t>(Int128Low64(lhs) << (amount - 64)), 0);
+  }
+}
+
+constexpr int128 operator>>(int128 lhs, int amount) {
+  // int64_t shifts of >= 63 are undefined, so we need some special-casing.
+  assert(amount >= 0 && amount < 127);
+
+  if (amount <= 0) {
+    return lhs;
+  } else if (amount < 63) {
+    return MakeInt128(Int128High64(lhs) >> amount, Int128Low64(lhs) >> amount | static_cast<uint64_t>(Int128High64(lhs))
+                                                                                    << (64 - amount));
+  } else if (amount == 63) {
+    return MakeInt128((Int128High64(lhs) >> 32) >> 31,
+                      static_cast<uint64_t>(Int128High64(lhs) << 1) | (Int128Low64(lhs) >> 32) >> 31);
+  } else if (amount >= 127) {
+    return MakeInt128((Int128High64(lhs) >> 32) >> 31, static_cast<uint64_t>((Int128High64(lhs) >> 32) >> 31));
+  } else {  // amount >= 64 && amount < 127
+    return MakeInt128((Int128High64(lhs) >> 32) >> 31, static_cast<uint64_t>(Int128High64(lhs) >> (amount - 64)));
+  }
 }
 
 }  // namespace numbers
