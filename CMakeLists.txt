@@ -18,7 +18,7 @@ set(THIRD_PARTY_INCLUDE_DIR
 
 include_directories(${SRC_INCLUDE_DIR}  ${THIRD_PARTY_INCLUDE_DIR})
 
-# add_subdirectory(src)
+add_subdirectory(src)
 add_subdirectory(examples)
 add_subdirectory(third_party)
 add_subdirectory(test)

@@ -127,14 +127,14 @@ TEST(Int128Test, int128Mul) {
   ASSERT_EQ(a * ub, ret);
 }
 
-// TEST(Int128Test, int128Div) {
-//   unsigned long ua = 123458;
-//   unsigned long ub = 10;
-//   unsigned long ret = ua / ub;
+TEST(Int128Test, int128Div) {
+  unsigned long ua = 123458;
+  unsigned long ub = 10;
+  unsigned long ret = ua / ub;
 
-//   int128 a = ua;
-//   int128 b = ub;
-//   ASSERT_EQ(a / b, ret);
-//   ASSERT_EQ(ua / b, ret);
-//   ASSERT_EQ(a / ub, ret);
-// }
+  int128 a = ua;
+  int128 b = ub;
+  ASSERT_EQ(a / b, ret);
+  ASSERT_EQ(ua / b, ret);
+  ASSERT_EQ(a / ub, ret);
+}

@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
-// modified from abseil-cpp
+// modified from abseil-cpp guuzaa
 
 #ifndef NUMBERS_INT128_HH
 #define NUMBERS_INT128_HH
@@ -278,6 +278,7 @@ class int128 {
  private:
   constexpr int128(int64_t high, uint64_t low);
 
+  // TODO Unimplemented!
   std::string ToString() const;
 
   // little endian
@@ -578,6 +579,8 @@ inline uint128 operator*(uint128 lhs, uint128 rhs) {
 }
 
 // TODO implement division and modulo
+
+
 
 // Increment/decrement operators
 inline uint128 uint128::operator++(int) {

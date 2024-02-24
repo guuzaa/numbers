@@ -1,3 +1,5 @@
+add_subdirectory(numbers)
+
 add_library(numbers_lib STATIC ${ALL_OBJECT_FILES})
 
 find_package(Threads REQUIRED)
