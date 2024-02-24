@@ -80,17 +80,17 @@ uint128 operator/(uint128 lhs, uint128 rhs) {
 }
 
 namespace {
-uint128 UnsignedAbsoluteValue(int128 v) { return Int128High64(v) < 0 ? -uint128(v) : uint128(v); }
+uint128 UnsignedAbsoluteValue(int128 v) { return int128_high64(v) < 0 ? -uint128(v) : uint128(v); }
 
 }  // namespace
 
 int128 operator/(int128 lhs, int128 rhs) {
-  assert(lhs != Int128Min() || rhs != -1);  // overflowing
+  assert(lhs != int128::MIN || rhs != -1);  // overflowing
 
   uint128 quotient = 0;
   uint128 remainder = 0;
   DivModImpl(UnsignedAbsoluteValue(lhs), UnsignedAbsoluteValue(rhs), &quotient, &remainder);
-  if ((Int128High64(lhs) < 0) != (Int128High64(rhs) < 0)) {
+  if ((int128_high64(lhs) < 0) != (int128_high64(rhs) < 0)) {
     quotient = -quotient;
   }
   return make_int128(int128_internal::BitCastToSigned(Uint128High64(quotient)), Uint128Low64(quotient));
