@@ -2,7 +2,7 @@
 
 #include "gtest/gtest.h"
 
-#include "numbers.h"
+#include "uinteger.hh"
 #include "test/utils.hh"
 
 TEST(UintegerTest, UintegerTemplate) {
