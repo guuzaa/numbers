@@ -20,6 +20,7 @@
 
 #include <cmath>
 #include <string>
+#include <cassert>
 
 namespace numbers {
 class int128;
