@@ -208,3 +208,114 @@ TEST(Int128Test, IncrementDecrement) {
   EXPECT_EQ(0, ++val);
   EXPECT_EQ(0, val);
 }
+
+TEST(Int128Test, Multiplication) {
+  for (int i = 0; i < 64; ++i) {
+    for (int j = 0; j < 127 - i; ++j) {
+      int128 a = int128(1) << i;
+      int128 b = int128(1) << j;
+      int128 c = int128(1) << (i + j);
+
+      EXPECT_EQ(c, a * b);
+      EXPECT_EQ(-c, -a * b);
+      EXPECT_EQ(-c, a * -b);
+      EXPECT_EQ(c, -a * -b);
+
+      EXPECT_EQ(c, int128(a) *= b);
+      EXPECT_EQ(-c, int128(-a) *= b);
+      EXPECT_EQ(-c, int128(a) *= -b);
+      EXPECT_EQ(c, int128(-a) *= -b);
+    }
+  }
+
+  // pairs will not overflow signed 64-bit multiplication
+  std::pair<int64_t, int64_t> small_values[] = {
+      {0x5e61, 0xf29f79ca14b4},   // +, +
+      {0x3e033b, -0x612c0ee549},  // +, -
+      {-0x052c37e8, 0x7c728f0f},  // -, +
+      {-0x7c728f0f, -0xfb17e8},   // -, -
+  };
+
+  for (const auto &[first, second] : small_values) {
+    EXPECT_EQ(int128(first * second), int128(first) * int128(second));
+    EXPECT_EQ(int128(first * second), int128(first) *= int128(second));
+
+    EXPECT_EQ(make_int128(first * second, 0), make_int128(first, 0) * int128(second));
+    EXPECT_EQ(make_int128(first * second, 0), make_int128(first, 0) *= int128(second));
+  }
+
+  std::pair<int64_t, int64_t> small_values2[] = {
+      {0x1bb0a110, 0x31487671},
+      {0x4792784e, 0x28add7d7},
+      {0x7b66553a, 0x11dff8ef},
+  };
+  for (const auto &[first, second] : small_values2) {
+    int128 a = int128(first << 32);
+    int128 b = int128(second << 32);
+    int128 c = make_int128(first * second, 0);
+
+    EXPECT_EQ(c, a * b);
+    EXPECT_EQ(-c, -a * b);
+    EXPECT_EQ(-c, a * -b);
+    EXPECT_EQ(c, -a * -b);
+
+    EXPECT_EQ(c, int128(a) *= b);
+    EXPECT_EQ(-c, int128(-a) *= b);
+    EXPECT_EQ(-c, int128(a) *= -b);
+    EXPECT_EQ(c, int128(-a) *= -b);
+  }
+
+  int128 large_values[] = {
+      {make_int128(0xd66f061af02d0408, 0x727d2846cb475b53)},
+      {make_int128(0x27b8d5ed6104452d, 0x03f8a33b0ee1df4f)},
+      {-make_int128(0x621b6626b9e8d042, 0x27311ac99df00938)},
+      {-make_int128(0x34e0656f1e95fb60, 0x4281cfd731257a47)},
+  };
+  for (auto val : large_values) {
+    EXPECT_EQ(0, 0 * val);
+    EXPECT_EQ(0, val * 0);
+    EXPECT_EQ(0, int128(0) *= val);
+    EXPECT_EQ(0, val *= 0);
+
+    EXPECT_EQ(val, 1 * val);
+    EXPECT_EQ(val, val * 1);
+    EXPECT_EQ(val, int128(1) *= val);
+    EXPECT_EQ(val, val *= 1);
+
+    EXPECT_EQ(-val, -1 * val);
+    EXPECT_EQ(-val, val * -1);
+    EXPECT_EQ(-val, int128(-1) * val);
+    EXPECT_EQ(-val, val *= -1);
+  }
+
+  // Manually calculated random large value cases
+  EXPECT_EQ(make_int128(0xcd0efd3442219bb, 0xde47c05bcd9df6e1),
+            make_int128(0x7c6448, 0x3bc4285c47a9d253) * 0x1a6037537b);
+  EXPECT_EQ(make_int128(0x19c8b7620b507dc4, 0xfec042b71a5f29a4),
+            -0x3e39341147 * -make_int128(0x6a14b2, 0x5ed34cca42327b3c));
+
+  EXPECT_EQ(make_int128(0xcd0efd3442219bb, 0xde47c05bcd9df6e1),
+            make_int128(0x7c6448, 0x3bc4285c47a9d253) *= int128(0x1a6037537b));
+  EXPECT_EQ(make_int128(0x19c8b7620b507dc4, 0xfec042b71a5f29a4),
+            int128(-0x3e39341147) *= -make_int128(0x6a14b2, 0x5ed34cca42327b3c));
+}
+
+TEST(Int128Test, DivisionAndModulo) {
+  std::pair<int64_t, int64_t> small_pairs[] = {
+      {0x15f2a64138, 0x67da05},    {0x5e56d194af43045f, 0xcf1543fb99},
+      {0x15e61ed052036a, -0xc8e6}, {0x88125a341e85, -0xd23fb77683},
+      {-0xc06e20, 0x5a},           {-0x4f100219aea3e85d, 0xdcc56cb4efe993},
+      {-0x168d629105, -0xa7},      {-0x7b44e92f03ab2375, -0x6516},
+  };
+  for (const auto &[first, second] : small_pairs) {
+    int128 dividend = first;
+    int128 divisor = second;
+    int64_t quotient = first / second;
+    int64_t remainder = first % second;
+
+    EXPECT_EQ(quotient, dividend / divisor);
+    EXPECT_EQ(quotient, int128(dividend) /= divisor);
+    EXPECT_EQ(remainder, dividend % divisor);
+    EXPECT_EQ(remainder, int128(dividend) %= divisor);
+  }
+}
