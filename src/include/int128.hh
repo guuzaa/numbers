@@ -281,15 +281,14 @@ class int128 {
  private:
   constexpr int128(int64_t high, uint64_t low);
 
-  // TODO Unimplemented!
-  std::string ToString() const;
+  std::string to_string() const;
 
   // little endian
   uint64_t lo_;
   int64_t hi_;
 };
 
-// std::ostream &operator<<(std::ostream &os, int128 v);
+ std::ostream &operator<<(std::ostream &os, int128 v);
 
 constexpr int128 int128_max() {
   return int128((std::numeric_limits<int64_t>::max)(), (std::numeric_limits<uint64_t>::max)());
@@ -331,9 +330,9 @@ class numeric_limits<numbers::int128> {
   static constexpr bool traps = numeric_limits<uint64_t>::traps;
   static constexpr bool tinyness_before = false;
 
-  static constexpr numbers::int128(min)() { return numbers::int128::MIN; }
-  static constexpr numbers::int128 lowest() { return numbers::int128::MIN; }
-  static constexpr numbers::int128(max)() { return numbers::int128::MAX; }
+  static constexpr numbers::int128(min)() { return numbers::int128_min(); }
+  static constexpr numbers::int128 lowest() { return numbers::int128_min(); }
+  static constexpr numbers::int128(max)() { return numbers::int128_max(); }
   static constexpr numbers::int128 epsilon() { return 0; }
   static constexpr numbers::int128 round_error() { return 0; }
   static constexpr numbers::int128 infinity() { return 0; }

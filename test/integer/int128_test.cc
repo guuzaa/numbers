@@ -1,7 +1,6 @@
 #include "gtest/gtest.h"
 
 #include <numeric>
-#include <vector>
 
 #include "int128.hh"
 
@@ -318,4 +317,158 @@ TEST(Int128Test, DivisionAndModulo) {
     EXPECT_EQ(remainder, dividend % divisor);
     EXPECT_EQ(remainder, int128(dividend) %= divisor);
   }
+
+  // randomly generated large values for 0, 1 and -1
+  int128 values[] = {
+      make_int128(0x63d26ee688a962b2, 0x9e1411abda5c1d70),
+      make_int128(0x152f385159d6f986, 0xbf8d48ef63da395d),
+      -make_int128(0x3098d7567030038c, 0x14e7a8a098dc2164),
+      -make_int128(0x49a037aca35c809f, 0xa6a87525480ef330),
+  };
+  for (auto val : values) {
+    SCOPED_TRACE(::testing::Message() << "val: " << val);
+
+    EXPECT_EQ(0, 0 / val);
+    EXPECT_EQ(0, int128(0) /= val);
+    EXPECT_EQ(0, 0 % val);
+    EXPECT_EQ(0, int128(0) %= val);
+
+    EXPECT_EQ(val, val / 1);
+    EXPECT_EQ(val, int128(val) /= 1);
+    EXPECT_EQ(0, val % 1);
+    EXPECT_EQ(0, int128(val) %= 1);
+
+    EXPECT_EQ(-val, val / -1);
+    EXPECT_EQ(-val, int128(val) /= -1);
+    EXPECT_EQ(0, val % -1);
+    EXPECT_EQ(0, int128(val) %= -1);
+  }
+
+  // Min and max
+  EXPECT_EQ(0, int128_max() / int128_min());
+  EXPECT_EQ(int128_max(), int128_max() % int128_min());
+  EXPECT_EQ(-1, int128_min() / int128_max());
+  EXPECT_EQ(-1, int128_min() % int128_max());
+
+  // Power of two division and modulo of random large values
+  int128 positive_values[] = {
+      make_int128(0x21e1a1cc69574620, 0xe7ac447fab2fc869),
+      make_int128(0x32c2ff3ab89e66e8, 0x03379a613fd1ce74),
+      make_int128(0x6f32ca786184dcaf, 0x046f9c9ecb3a9ce1),
+      make_int128(0x1aeb469dd990e0ee, 0xda2740f243cd37eb),
+  };
+  for (auto val : positive_values) {
+    for (int i = 0; i < 127; ++i) {
+      int128 power_of_two = int128(1) << i;
+      EXPECT_EQ(val >> i, val / power_of_two);
+      EXPECT_EQ(val >> i, int128(val) /= power_of_two);
+      EXPECT_EQ(val & (power_of_two - 1), val % power_of_two);
+      EXPECT_EQ(val & (power_of_two - 1), int128(val) %= power_of_two);
+    }
+  }
+
+  // Manually calculated random large value cases
+  struct DivisionModCase {
+    int128 dividend;
+    int128 divisor;
+    int128 quotient;
+    int128 remainder;
+  };
+
+  DivisionModCase cases[] = {
+      {make_int128(0x6ada48d489007966, 0x3c9c5c98150d5d69), make_int128(0x8bc308fb, 0x8cb9cc9a3b803344), 0xc3b87e08,
+       make_int128(0x1b7db5e1, 0xd9eca34b7af04b49)},
+      {make_int128(0xd6946511b5b, 0x4886c5c96546bf5f), -make_int128(0x263b, 0xfd516279efcfe2dc), -0x59cbabf0,
+       make_int128(0x622, 0xf462909155651d1f)},
+      {-make_int128(0x33db734f9e8d1399, 0x8447ac92482bca4d), 0x37495078240, -make_int128(0xf01f1, 0xbc0368bf9a77eae8),
+       -0x21a508f404d},
+      {-make_int128(0x13f837b409a07e7d, 0x7fc8e248a7d73560), -0x1b9f, make_int128(0xb9157556d724, 0xb14f635714d7563e),
+       -0x1ade},
+  };
+  for (const auto &[dividend, divisor, quotient, remainder] : cases) {
+    EXPECT_EQ(quotient, dividend / divisor);
+    EXPECT_EQ(quotient, int128(dividend) /= divisor);
+    EXPECT_EQ(remainder, dividend % divisor);
+    EXPECT_EQ(remainder, int128(dividend) %= divisor);
+  }
+}
+
+TEST(Int128Test, BitwiseLogic) {
+  EXPECT_EQ(int128(-1), ~int128(0));
+
+  int128 values[] = {
+      0,
+      -1,
+      0xde400bee05c3ff6b,
+      make_int128(0x7f32178dd81d634a, 0),
+      make_int128(0xaf539057055613a, 0x7d104d7d946c2e4d),
+  };
+  for (auto val : values) {
+    SCOPED_TRACE(::testing::Message() << "val: " << val);
+
+    EXPECT_EQ(val, ~~val);
+    EXPECT_EQ(val, val & val);
+    EXPECT_EQ(val, val | val);
+    EXPECT_EQ(0, val ^ val);
+
+    EXPECT_EQ(val, int128(val) &= val);
+    EXPECT_EQ(val, int128(val) |= val);
+    EXPECT_EQ(0, int128(val) ^= val);
+
+    EXPECT_EQ(val, val | 0);
+    EXPECT_EQ(0, val & 0);
+    EXPECT_EQ(val, val ^ 0);
+
+    EXPECT_EQ(int128(-1), val | int128(-1));
+    EXPECT_EQ(val, val & int128(-1));
+    EXPECT_EQ(~val, val ^ int128(-1));
+  }
+
+  std::pair<int64_t, int64_t> pairs64[] = {
+      {0x7f86797f5e991af4, 0x1ee30494fb007c97}, {0x0b278282bacf01af, 0x58780e0a57a49e86},
+      {0x059f266ccb93a666, 0x3d5b731bae9286f5}, {0x63c0c4820f12108c, 0x58166713c12e1c3a},
+      {0x381488bb2ed2a66e, 0x2220a3eb76a3698c}, {0x2a0a0dfb81e06f21, 0x4b60585927f5523c},
+      {0x555b1c3a03698537, 0x25478cd19d8e53cb}, {0x4750f6f27d779225, 0x16397553c6ff05fc},
+  };
+  for (const auto &[first, second] : pairs64) {
+    SCOPED_TRACE(::testing::Message() << "first: " << first << ", second: " << second);
+
+    EXPECT_EQ(make_int128(~first, ~second), ~make_int128(first, second));
+    EXPECT_EQ(int128(first & second), int128(first) & int128(second));
+    EXPECT_EQ(int128(first | second), int128(first) | int128(second));
+    EXPECT_EQ(int128(first ^ second), int128(first) ^ int128(second));
+
+    EXPECT_EQ(int128(first & second), int128(first) &= int128(second));
+    EXPECT_EQ(int128(first | second), int128(first) |= int128(second));
+    EXPECT_EQ(int128(first ^ second), int128(first) ^= int128(second));
+
+    EXPECT_EQ(make_int128(first & second, 0), make_int128(first, 0) & make_int128(second, 0));
+    EXPECT_EQ(make_int128(first | second, 0), make_int128(first, 0) | make_int128(second, 0));
+    EXPECT_EQ(make_int128(first ^ second, 0), make_int128(first, 0) ^ make_int128(second, 0));
+
+    EXPECT_EQ(make_int128(first & second, 0), make_int128(first, 0) &= make_int128(second, 0));
+    EXPECT_EQ(make_int128(first | second, 0), make_int128(first, 0) |= make_int128(second, 0));
+    EXPECT_EQ(make_int128(first ^ second, 0), make_int128(first, 0) ^= make_int128(second, 0));
+  }
+}
+
+TEST(Int128Test, BitwiseShiftTest) {
+  for (int i = 0; i < 64; ++i) {
+    for (int j = 0; j <= i; ++j) {
+      SCOPED_TRACE(::testing::Message() << "i: " << i << ", j: " << j);
+      EXPECT_EQ(uint64_t(1) << i, int128(uint64_t(1) << j) << (i - j));
+      EXPECT_EQ(uint64_t(1) << i, int128(uint64_t(1) << j) <<= (i - j));
+    }
+  }
+}
+
+TEST(Int128Test, NumericLimits) {
+  static_assert(std::numeric_limits<int128>::is_specialized, "std::numeric_limits<int128> must be specialized");
+  static_assert(std::numeric_limits<int128>::is_signed, "std::numeric_limits<int128> must be signed");
+  static_assert(std::numeric_limits<int128>::is_integer, "std::numeric_limits<int128> must be integer");
+
+  EXPECT_EQ(static_cast<int>(127 * std::log10(2)), std::numeric_limits<int128>::digits10);
+  EXPECT_EQ(int128_min(), std::numeric_limits<int128>::min());
+  EXPECT_EQ(int128_min(), std::numeric_limits<int128>::lowest());
+  EXPECT_EQ(int128_max(), std::numeric_limits<int128>::max());
 }

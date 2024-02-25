@@ -1,2 +1,12 @@
 .vscode/
+.idea
+
 build/
+.build_debug/*
+.build_release/*
+distribute/*
+*.testbin
+*.bin
+cmake_build
+.cmake_build
+cmake-build-*
