@@ -12,29 +12,29 @@ numbers
 
 - **Like Primitive Types**
 
-- **Signed Integers**: Int8 Int16 Int32 Int64
+- **Signed Integers**: int8 int16 int32 int64 int128
 
-- **Unsigned Integers**: Uint8 Uint16 Uint32 Uint64
+- **Unsigned Integers**: uint8 uint16 uint32 uint64
 
 ## How to use
 
 ### operator +
 ```c++
-Int8 a = 100_i8;
+numbers::int8 a = 100;
 std::cout << a << '\n';
 try {
     a = a + a;
     std::cout << a << '\n';
-} catch (std::runtime_error err) {
+} catch (std::runtime_error &err) {
     std::cout << "Catch error: " << err.what() << '\n';
 }
 ```
 
 ### checked sub
 ```c++
-Int8 a = Int8::MIN;
+numbers::int8 a = numbers::int8::MIN;
 std::cout << a << '\n';
-std::optional<Int8> ret = a.checked_sub(1);
+std::optional<numbers::int8> ret = a.checked_sub(1);
 if (ret) {
     std::cout << ret.value() << '\n';
 } else {
@@ -44,8 +44,8 @@ if (ret) {
 
 ### overflowing div
 ```c++
-Int16 a = 40_i16;
-Int16 b = 2_i16;
+numbers::int16 a = 40;
+numbers::int16 b = 2;
 auto [ret, overflowing] = a.overflowing_div(b);
 std::cout <<"a= " << a << ", b= " << b << '\n';
 if (!overflowing) {
@@ -57,9 +57,9 @@ if (!overflowing) {
 
 ### saturating mul
 ```c++
-Int64 a = 40_i64;
-Int64 b = Int64::MAX;
+numbers::int64 a = 40;
+numbers::int64 b = numbers::int64::MAX;
 std::cout << "a= " << a << ", b= " << b << '\n';
-Int64 ret = a.saturating_mul(b);
+numbers::int64 ret = a.saturating_mul(b);
 std::cout << ret << '\n';
 ```
