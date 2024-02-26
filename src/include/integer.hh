@@ -6,6 +6,10 @@
 #include <optional>
 #include <type_traits>
 
+namespace numbers {
+
+namespace {
+
 template <typename T, typename = std::enable_if_t<std::is_signed_v<T>>>
 class Integer {
  private:
@@ -264,18 +268,13 @@ class Integer {
   T num_;
 };
 
-using Int8 = Integer<int8_t>;
-using Int16 = Integer<int16_t>;
-using Int32 = Integer<int32_t>;
-using Int64 = Integer<int64_t>;
+}  // namespace
 
-constexpr Int8 operator"" _i8(unsigned long long val) { return Int8(val); }
+using int8 = Integer<int8_t>;
+using int16 = Integer<int16_t>;
+using int32 = Integer<int32_t>;
+using int64 = Integer<int64_t>;
 
-constexpr Int16 operator"" _i16(unsigned long long val) { return Int16(val); }
-
-constexpr Int32 operator"" _i32(unsigned long long val) { return Int32(val); }
-
-constexpr Int64 operator"" _i64(unsigned long long val) { return Int64(val); }
-
+}  // namespace numbers
 
 #endif

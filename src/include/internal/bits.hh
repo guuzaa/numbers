@@ -2,6 +2,7 @@
 #define NUMBERS_INTERNAL_BITS_HH
 
 #include <type_traits>
+#include <limits>
 
 namespace numbers_internal {
 

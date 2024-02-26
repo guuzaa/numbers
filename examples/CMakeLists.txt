@@ -4,6 +4,8 @@ project(NumbersExample LANGUAGES CXX)
 
 add_executable(${PROJECT_NAME} EXCLUDE_FROM_ALL main.cc)
 
+target_link_libraries(${PROJECT_NAME} PRIVATE numbers_obj)
+
 add_custom_target(example
     COMMAND ${PROJECT_NAME}
     DEPENDS ${PROJECT_NAME}
