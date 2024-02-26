@@ -304,6 +304,9 @@ inline int128 int128::MIN = int128_min();
 
 namespace std {
 template <>
+struct is_signed<numbers::int128> : std::true_type {};
+
+template <>
 class numeric_limits<numbers::int128> {
  public:
   static constexpr bool is_specialized = true;
@@ -779,7 +782,8 @@ constexpr int128 operator~(int128 v) { return make_int128(~int128_high64(v), ~in
 namespace int128_internal {
 constexpr int128 SignedAddResult(int128 result, int128 lhs) {
   // check for carry
-  return (int128_low64(result) < int128_low64(lhs)) ? make_int128(int128_high64(result) + 1, int128_low64(result)) : result;
+  return (int128_low64(result) < int128_low64(lhs)) ? make_int128(int128_high64(result) + 1, int128_low64(result))
+                                                    : result;
 }
 }  // namespace int128_internal
 
@@ -791,7 +795,8 @@ constexpr int128 operator+(int128 lhs, int128 rhs) {
 namespace int128_internal {
 constexpr int128 SignedSubstructResult(int128 result, int128 lhs, int128 rhs) {
   // check for carry
-  return (int128_low64(lhs) < int128_low64(rhs)) ? make_int128(int128_high64(result) - 1, int128_low64(result)) : result;
+  return (int128_low64(lhs) < int128_low64(rhs)) ? make_int128(int128_high64(result) - 1, int128_low64(result))
+                                                 : result;
 }
 }  // namespace int128_internal
 

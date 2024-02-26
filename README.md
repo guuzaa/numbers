@@ -3,6 +3,12 @@ numbers
 </h1>
 
 [![CMake CI Matrix](https://github.com/guuzaa/numbers/actions/workflows/cmake.yml/badge.svg?branch=main)](https://github.com/guuzaa/numbers/actions/workflows/cmake.yml)
+![Static Badge](https://img.shields.io/badge/Language-C++17-red)
+![Static Badge](https://img.shields.io/badge/License-MIT-pink)
+![Static Badge](https://img.shields.io/badge/OS-Linux-blue)
+![Static Badge](https://img.shields.io/badge/OS-macOS-blue)
+
+**Note: This project is in the early stages of development. The codebase is subject to significant changes and reorganization. Expect breaking changes as we refine the architecture, fix bugs, and implement new features.**
 
 `numbers` is a library for C++17 and later versions that handles integer overflow similar to Rust. It simplifies integer computations and offers control over how to handle overflow situations.
 
@@ -16,7 +22,7 @@ numbers
 
 - **Unsigned Integers**: uint8 uint16 uint32 uint64
 
-## How to use
+## Usage
 
 ### operator +
 ```c++
@@ -63,3 +69,11 @@ std::cout << "a= " << a << ", b= " << b << '\n';
 numbers::int64 ret = a.saturating_mul(b);
 std::cout << ret << '\n';
 ```
+
+## Contribute
+
+We welcome contributions, but please be aware that the project's design and conventions are still evolving. If you'd like to contribute, it's a good idea to discuss your plans with the project maintainers before starting work.
+
+For the latest updates and discussions, please see our [issues](./issues) and [pull requests](./pulls).
+
+Stay tuned for more updates, and thank you for your interest in contributing to our project!
