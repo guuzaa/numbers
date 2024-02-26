@@ -21,6 +21,7 @@
 #include <cassert>
 #include <cmath>
 #include <string>
+#include <limits>
 
 namespace numbers {
 class int128;
