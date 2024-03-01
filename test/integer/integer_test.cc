@@ -7,7 +7,65 @@
 
 using namespace numbers;
 
-TEST(IntegerTest, IntegerMinMax) {
+typedef ::testing::Types<bool, char, signed char, unsigned char, char16_t, char32_t, short, unsigned short, int,
+                         unsigned int, long, unsigned long, long long, unsigned long long>
+    IntegerTypes;
+
+template <typename T>
+class IntegerTraitsTest : public ::testing::Test {};
+
+TYPED_TEST_SUITE(IntegerTraitsTest, IntegerTypes);
+
+TYPED_TEST(IntegerTraitsTest, ConstructAssignTest) {
+  static_assert(std::is_constructible<int8, TypeParam>::value, "numbers::int8 must be constructible from TypeParam");
+  static_assert(std::is_assignable<int8 &, TypeParam>::value, "numbers::int8 must be assignable from TypeParam");
+  static_assert(!std::is_assignable<TypeParam &, int8>::value, "TypeParam must not be assignable from numbers::int8");
+
+  static_assert(std::is_constructible<int16, TypeParam>::value, "numbers::int16 must be constructible from TypeParam");
+  static_assert(std::is_assignable<int16 &, TypeParam>::value, "numbers::int16 must be assignable from TypeParam");
+  static_assert(!std::is_assignable<TypeParam &, int16>::value, "TypeParam must not be assignable from numbers::int16");
+
+  static_assert(std::is_constructible<int32, TypeParam>::value, "numbers::int32 must be constructible from TypeParam");
+  static_assert(std::is_assignable<int32 &, TypeParam>::value, "numbers::int32 must be assignable from TypeParam");
+  static_assert(!std::is_assignable<TypeParam &, int32>::value, "TypeParam must not be assignable from numbers::int32");
+
+  static_assert(std::is_constructible<int64, TypeParam>::value, "numbers::int64 must be constructible from TypeParam");
+  static_assert(std::is_assignable<int64 &, TypeParam>::value, "numbers::int64 must be assignable from TypeParam");
+  static_assert(!std::is_assignable<TypeParam &, int64>::value, "TypeParam must not be assignable from numbers::int64");
+}
+
+typedef ::testing::Types<int8, int16, int32, int64> Integers;
+
+template <typename T>
+class integerTest : public ::testing::Test {};
+
+TYPED_TEST_SUITE(integerTest, Integers);
+
+TYPED_TEST(integerTest, BoolConversion) {
+  EXPECT_FALSE(TypeParam(0));
+  for (int i = 0; i < sizeof(TypeParam); ++i) {
+    EXPECT_TRUE(TypeParam(1) << i);
+  }
+
+  EXPECT_TRUE(TypeParam::MIN);
+  EXPECT_TRUE(TypeParam::MAX);
+  EXPECT_EQ(TypeParam(1), TypeParam(true));
+  EXPECT_EQ(TypeParam(0), TypeParam(false));
+}
+
+TYPED_TEST(integerTest, IncrementDecrement) {
+  TypeParam val = 0;
+  EXPECT_EQ(0, val++);
+  EXPECT_EQ(1, val);
+  EXPECT_EQ(1, val--);
+  EXPECT_EQ(0, val);
+  EXPECT_EQ(-1, --val);
+  EXPECT_EQ(-1, val);
+  EXPECT_EQ(0, ++val);
+  EXPECT_EQ(0, val);
+}
+
+TEST(integerTest, IntegerMinMax) {
   ASSERT_THROW(-int64::MIN, std::runtime_error);
   ASSERT_EQ(int16::MIN.saturating_neg(), int16::MAX);
   ASSERT_EQ(int16::MAX.saturating_add(int16::MAX), int16::MAX);
@@ -42,7 +100,7 @@ TEST(integerTest, integerAdd) {
 
   ASSERT_EQ(num + num1, num2);
   ASSERT_EQ(zero_num + max_num, max_num);
-  ASSERT_EQ(max_num + min_num, -1);
+  ASSERT_EQ(max_num += min_num, -1);
 }
 
 TEST(integerTest, integerAddNoSideEffects) {
@@ -93,7 +151,7 @@ TEST(integerTest, integerAddByAccumulate) {
   constexpr size_t len = 100;
   std::vector<int64> nums(len);
   ASSERT_EQ(nums.size(), len);
-  std::iota(nums.begin(), nums.end(), int64(1));
+  std::iota(nums.begin(), nums.end(), 1);
   ASSERT_EQ(std::accumulate(nums.begin(), nums.end(), int64(0)), int64(5050));
 }
 
@@ -289,6 +347,16 @@ TEST(integerTest, integerAddOverflow) {
     int64 num1 = int64::MIN;
     ASSERT_THROW(num + num1, std::runtime_error);
   }
+
+  {
+    int64 num = int64::MAX;
+    ASSERT_THROW(++num, std::runtime_error);
+  }
+
+  {
+    int64 num = int64::MAX;
+    ASSERT_THROW(num++, std::runtime_error);
+  }
 }
 
 TEST(integerTest, integerAddOverflowByAccumulate) {
@@ -345,6 +413,18 @@ TEST(integerTest, integerSubOverflow) {
     int16 num = n;
     int16 num1 = int16::MIN;
     ASSERT_THROW(num1 - num, std::runtime_error);
+  }
+  {
+    int16 num1 = int16::MIN;
+    ASSERT_THROW(num1--, std::runtime_error);
+  }
+  {
+    int16 num1 = int16::MIN;
+    ASSERT_THROW(--num1, std::runtime_error);
+  }
+  {
+    int16 num1 = int16::MIN;
+    ASSERT_THROW(num1 -= 1, std::runtime_error);
   }
 }
 
