@@ -3,10 +3,10 @@ numbers
 </h1>
 
 [![CMake CI Matrix](https://github.com/guuzaa/numbers/actions/workflows/cmake.yml/badge.svg?branch=main)](https://github.com/guuzaa/numbers/actions/workflows/cmake.yml)
-![Static Badge](https://img.shields.io/badge/Language-C++17-red)
-![Static Badge](https://img.shields.io/badge/License-MIT-pink)
-![Static Badge](https://img.shields.io/badge/OS-Linux-blue)
-![Static Badge](https://img.shields.io/badge/OS-macOS-blue)
+![language c++17](https://img.shields.io/badge/Language-C++17-red)
+[![license mit](https://img.shields.io/badge/License-MIT-pink)](https://github.com/guuzaa/numbers/blob/main/LICENSE.txt)
+![linux](https://img.shields.io/badge/OS-Linux-blue)
+![macOS](https://img.shields.io/badge/OS-macOS-blue)
 
 > [!IMPORTANT]  
 > This project is in the early stages of development. The codebase is subject to significant changes and reorganization. Expect breaking changes as we refine the architecture, fix bugs, and implement new features.

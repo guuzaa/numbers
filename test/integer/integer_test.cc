@@ -34,7 +34,7 @@ TYPED_TEST(IntegerTraitsTest, ConstructAssignTest) {
   static_assert(!std::is_assignable<TypeParam &, int64>::value, "TypeParam must not be assignable from numbers::int64");
 }
 
-typedef ::testing::Types<int8, int16, int32, int64> Integers;
+typedef ::testing::Types<int8, int16, int32, int64, i128> Integers;
 
 template <typename T>
 class integerTest : public ::testing::Test {};

@@ -5,6 +5,7 @@
 #include <limits>
 #include <optional>
 #include <type_traits>
+#include "int128.hh"
 
 namespace numbers {
 
@@ -22,7 +23,7 @@ class Integer {
   template <typename U, typename = std::enable_if<std::is_convertible_v<U, T> && std::is_signed_v<U>>>
   Integer(U num) noexcept : num_{static_cast<T>(num)} {}
 
-  constexpr Integer operator+(const Integer<T> &other) const noexcept(false) {
+  constexpr Integer operator+(Integer<T> other) const noexcept(false) {
     if (add_overflow(num_, other.num_)) {
       throw std::runtime_error("add overflow");
     }
@@ -226,12 +227,12 @@ class Integer {
     return *this;
   }
 
-  Integer &operator<<(int amount) {
+  Integer operator<<(int amount) {
     num_ <<= amount;
     return *this;
   }
 
-  Integer &operator>>(int amount) {
+  Integer operator>>(int amount) {
     num_ >>= amount;
     return *this;
   }
@@ -301,8 +302,13 @@ class Integer {
   constexpr bool div_overflow(T a, T b) const noexcept { return a == min_ && b == -1; }
 
   constexpr bool mul_overflow(T a, T b) const {
-    T res;
-    return __builtin_mul_overflow(a, b, &res);
+    if constexpr (std::is_same_v<T, int128>) {
+      // TODO Unimplemented
+      return false;
+    } else {
+      T res;
+      return __builtin_mul_overflow(a, b, &res);
+    }
   }
 
   constexpr bool has_same_signal(T a, T b) const noexcept { return is_positive(a) == is_positive(b); }
@@ -316,6 +322,11 @@ template <typename T>
 constexpr Integer<T> &operator+=(Integer<T> lhs, Integer<T> rhs) noexcept(false) {
   lhs = lhs + rhs;
   return lhs;
+}
+
+template <typename U, typename T, typename = std::enable_if_t<std::is_signed_v<U> && std::is_convertible_v<U, T>>>
+constexpr Integer<T> operator+(U lhs, Integer<T> rhs) noexcept(false) {
+  return Integer<T>(lhs) + rhs;
 }
 
 template <typename T>
@@ -355,6 +366,7 @@ using int8 = Integer<int8_t>;
 using int16 = Integer<int16_t>;
 using int32 = Integer<int32_t>;
 using int64 = Integer<int64_t>;
+using i128 = Integer<int128>;
 
 }  // namespace numbers
 
