@@ -5,6 +5,7 @@
 #include <limits>
 #include <optional>
 #include <type_traits>
+#include "int128.hh"
 
 namespace numbers {
 
@@ -216,10 +217,11 @@ class Uinteger {
 
 }  // namespace
 
-using uint8 = Uinteger<uint8_t>;
-using uint16 = Uinteger<uint16_t>;
-using uint32 = Uinteger<uint32_t>;
-using uint64 = Uinteger<uint64_t>;
+using u8 = Uinteger<uint8_t>;
+using u16 = Uinteger<uint16_t>;
+using u32 = Uinteger<uint32_t>;
+using u64 = Uinteger<uint64_t>;
+// using u128 = Uinteger<uint128>;
 
 }  // namespace numbers
 

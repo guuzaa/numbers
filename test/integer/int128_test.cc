@@ -192,7 +192,7 @@ TEST(Int128Test, int128AdditionSubtraction) {
     EXPECT_EQ(make_int128(first - second, 0), make_int128(first, 0) -= make_int128(second, 0));
   }
 
-  // check postive carry
+  // check positive carry
   EXPECT_EQ(make_int128(31, 0), make_int128(20, 1) + make_int128(10, std::numeric_limits<uint64_t>::max()));
 }
 

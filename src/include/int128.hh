@@ -219,6 +219,8 @@ class int128 {
   constexpr explicit operator long long() const;
 
   constexpr explicit operator unsigned long long() const;
+
+  // TODO unimplemented!
   explicit operator float() const;
   explicit operator double() const;
   explicit operator long double() const;
@@ -367,8 +369,8 @@ inline uint128 &uint128::operator=(int128 v) { return *this = uint128(v); }
 
 // Arithmetic operators.
 
-constexpr uint128 operator<<(uint128 lhs, int amout);
-constexpr uint128 operator>>(uint128 lhs, int amout);
+constexpr uint128 operator<<(uint128 lhs, int amount);
+constexpr uint128 operator>>(uint128 lhs, int amount);
 constexpr uint128 operator+(uint128 lhs, uint128 rhs);
 constexpr uint128 operator-(uint128 lhs, uint128 rhs);
 uint128 operator*(uint128 lhs, uint128 rhs);

@@ -5,9 +5,9 @@
 
 void checked_sub_example() {
   std::cout << "==== checked_sub_example ==== \n";
-  numbers::int8 a = numbers::int8::MIN;
+  numbers::i8 a = numbers::i8::MIN;
   std::cout << a << '\n';
-  std::optional<numbers::int8> ret = a.checked_sub(1);
+  std::optional<numbers::i8> ret = a.checked_sub(1);
   if (ret) {
     std::cout << ret.value() << '\n';
   } else {
@@ -17,8 +17,8 @@ void checked_sub_example() {
 
 void overflowing_div_example() {
   std::cout << "==== overflowing_div_example ==== \n";
-  numbers::int16 a = 40;
-  numbers::int16 b = 2;
+  numbers::i16 a = 40;
+  numbers::i16 b = 2;
   auto [ret, overflowing] = a.overflowing_div(b);
   std::cout << "a= " << a << ", b= " << b << '\n';
   if (!overflowing) {
@@ -30,20 +30,20 @@ void overflowing_div_example() {
 
 void saturating_mul_example() {
   std::cout << "==== saturating_mul_example ==== \n";
-  numbers::int64 a = 40;
-  numbers::int64 b = numbers::int64::MAX;
+  numbers::i64 a = 40;
+  numbers::i64 b = numbers::i64::MAX;
   std::cout << "a= " << a << ", b= " << b << '\n';
-  numbers::int64 ret = a.saturating_mul(b);
+  numbers::i64 ret = a.saturating_mul(b);
   std::cout << ret << '\n';
 }
 
-void int128_example() {
-  std::cout << "==== int128_example ==== \n";
-  numbers::int128 a = 40;
-  numbers::int128 max = numbers::int128::MAX;
-  numbers::int128 min = numbers::int128::MIN;
+void i128_example() {
+  std::cout << "==== i128_example ==== \n";
+  numbers::i128 a = 40;
+  numbers::i128 max = numbers::i128::MAX;
+  numbers::i128 min = numbers::i128::MIN;
   std::cout << "a= " << a << ", max= " << max << ", min= " << min << '\n';
-  numbers::int128 ret = max - a;
+  numbers::i128 ret = max - a;
   std::cout << "max - a = " << ret << '\n';
 }
 
@@ -57,10 +57,10 @@ int main(int argc, char const *argv[]) {
     std::cout << "Catch error: " << err.what() << '\n';
   }
 
-  numbers::int8 b = 127;
-  numbers::int8 c = 0;
+  numbers::i8 b = 127;
+  numbers::i8 c = 0;
   try {
-    numbers::int8 ret = c - b;
+    numbers::i8 ret = c - b;
     std::cout << ret << '\n';
     c = -10;
     ret = c - b;
@@ -69,7 +69,7 @@ int main(int argc, char const *argv[]) {
     std::cout << "Catch error: " << err.what() << '\n';
   }
 
-  auto d = static_cast<numbers::int16>(b);
+  auto d = static_cast<numbers::i16>(b);
   try {
     d = d + d;
     std::cout << d << '\n';
@@ -80,7 +80,7 @@ int main(int argc, char const *argv[]) {
   checked_sub_example();
   overflowing_div_example();
   saturating_mul_example();
-  int128_example();
+  i128_example();
 
   return 0;
 }

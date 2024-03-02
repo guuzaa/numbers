@@ -5,12 +5,11 @@
 #include <limits>
 #include <optional>
 #include <type_traits>
+#include "int128.hh"
 
 namespace numbers {
 
-namespace {
-
-template <typename T, typename = std::enable_if_t<std::is_signed_v<T>>>
+template <typename T, typename = std::enable_if_t<std::is_signed_v<T> || std::is_same_v<T, int128>>>
 class Integer {
  private:
   constexpr static T min_ = std::numeric_limits<T>::min();
@@ -21,9 +20,10 @@ class Integer {
   inline static Integer<T> MAX = Integer<T>(max_);
 
   constexpr Integer() noexcept : num_{} {}
-  constexpr Integer(T num) noexcept : num_{num} {}
+  template <typename U, typename = std::enable_if<std::is_convertible_v<U, T> && std::is_signed_v<U>>>
+  Integer(U num) noexcept : num_{static_cast<T>(num)} {}
 
-  constexpr Integer operator+(const Integer<T> &other) const noexcept(false) {
+  constexpr Integer operator+(Integer<T> other) const noexcept(false) {
     if (add_overflow(num_, other.num_)) {
       throw std::runtime_error("add overflow");
     }
@@ -204,39 +204,84 @@ class Integer {
   }
 
   constexpr bool operator==(const Integer<T> &other) const noexcept { return num_ == other.num_; }
-  constexpr bool operator==(const T &other) const noexcept { return num_ == other; }
-
   constexpr bool operator<(const Integer<T> &other) const noexcept { return num_ < other.num_; }
-  constexpr bool operator<(const T &other) const noexcept { return num_ < other; }
-
   constexpr bool operator>(const Integer<T> &other) const noexcept { return num_ > other.num_; }
-  constexpr bool operator>(const T &other) const noexcept { return num_ > other; }
+
+  Integer &operator+=(Integer other) {
+    *this = *this + other;
+    return *this;
+  }
+
+  Integer &operator-=(Integer other) {
+    *this = *this - other;
+    return *this;
+  }
+
+  Integer &operator/=(Integer other) {
+    *this = *this / other;
+    return *this;
+  }
+
+  Integer &operator*=(Integer other) {
+    *this = *this * other;
+    return *this;
+  }
+
+  Integer operator<<(int amount) {
+    num_ <<= amount;
+    return *this;
+  }
+
+  Integer operator>>(int amount) {
+    num_ >>= amount;
+    return *this;
+  }
+
+  Integer &operator<<=(int amount) {
+    *this <<= amount;
+    return *this;
+  }
+
+  Integer &operator>>=(int amount) {
+    *this >>= amount;
+    return *this;
+  }
 
   // prefix ++
-  constexpr Integer &operator++() noexcept(false) {
-    if (add_overflow(num_, 1)) {
-      throw std::runtime_error("prefix ++ overflow");
-    }
-    num_ += 1;
+  Integer &operator++() noexcept(false) {
+    *this += Integer(1);
     return *this;
   }
 
   // postfix ++
-  constexpr Integer operator++(int) noexcept(false) {
-    if (add_overflow(num_, 1)) {
-      throw std::runtime_error("postfix ++ overflow");
-    }
+  Integer operator++(int) noexcept(false) {
     Integer<T> tmp = *this;
-    num_ += 1;
+    *this += Integer(1);
     return tmp;
   }
 
-  template <typename U, typename = std::enable_if<std::is_convertible_v<T, U>>>
+  // prefix --
+  Integer &operator--() noexcept(false) {
+    *this -= Integer(1);
+    return *this;
+  }
+
+  // postfix --
+  Integer operator--(int) noexcept(false) {
+    Integer<T> tmp = *this;
+    *this -= Integer(1);
+    return tmp;
+  }
+
+  template <typename U, typename = std::enable_if<std::is_convertible_v<U, T>>>
   explicit operator Integer<U>() const {
     return Integer<U>(static_cast<U>(num_));
   }
 
-  explicit operator T() const noexcept { return num_; }
+  template <typename U, typename = std::enable_if<std::is_convertible_v<U, T>>>
+  explicit operator U() const noexcept {
+    return static_cast<U>(num_);
+  }
 
   friend std::ostream &operator<<(std::ostream &os, const Integer<T> &num) {
     if constexpr (std::is_same<T, int8_t>::value) {
@@ -257,8 +302,22 @@ class Integer {
   constexpr bool div_overflow(T a, T b) const noexcept { return a == min_ && b == -1; }
 
   constexpr bool mul_overflow(T a, T b) const {
-    T res;
-    return __builtin_mul_overflow(a, b, &res);
+    if constexpr (std::is_same_v<T, int128>) {
+      if (a > 0) {
+        if (b > 0) {
+          return a > max_ / b;  // a * b > max_; a positive, b positive
+        }
+        return b < min_ / a;  // a * b < min_; a positive, b not positive
+      }
+
+      if (b > 0) {
+        return a < min_ / b;  // a * b < min_; a negative, b positive
+      }
+      return a != 0 && b < max_ / a;  // a * b > max_; a negative, b not positive
+    } else {
+      T res;
+      return __builtin_mul_overflow(a, b, &res);
+    }
   }
 
   constexpr bool has_same_signal(T a, T b) const noexcept { return is_positive(a) == is_positive(b); }
@@ -268,12 +327,55 @@ class Integer {
   T num_;
 };
 
-}  // namespace
+template <typename T>
+constexpr Integer<T> &operator+=(Integer<T> lhs, Integer<T> rhs) noexcept(false) {
+  lhs = lhs + rhs;
+  return lhs;
+}
 
-using int8 = Integer<int8_t>;
-using int16 = Integer<int16_t>;
-using int32 = Integer<int32_t>;
-using int64 = Integer<int64_t>;
+template <typename U, typename T, typename = std::enable_if_t<std::is_signed_v<U> && std::is_convertible_v<U, T>>>
+constexpr Integer<T> operator+(U lhs, Integer<T> rhs) noexcept(false) {
+  return Integer<T>(lhs) + rhs;
+}
+
+template <typename T>
+constexpr Integer<T> &operator-=(Integer<T> lhs, Integer<T> rhs) noexcept(false) {
+  lhs = lhs - rhs;
+  return lhs;
+}
+
+template <typename T>
+constexpr Integer<T> &operator/=(Integer<T> lhs, Integer<T> rhs) noexcept(false) {
+  lhs = lhs / rhs;
+  return lhs;
+}
+
+template <typename T>
+constexpr Integer<T> &operator*=(Integer<T> lhs, Integer<T> rhs) noexcept(false) {
+  lhs = lhs * rhs;
+  return lhs;
+}
+
+template <typename T>
+constexpr bool operator==(Integer<T> lhs, Integer<T> rhs) {
+  return lhs == rhs;
+}
+
+template <typename T>
+constexpr bool operator!=(Integer<T> lhs, Integer<T> rhs) {
+  return !(lhs == rhs);
+}
+
+template <typename U, typename T, typename = std::enable_if_t<std::is_signed_v<U> && std::is_convertible_v<U, T>>>
+constexpr bool operator==(U lhs, Integer<T> rhs) noexcept {
+  return Integer<T>(lhs) == rhs;
+}
+
+using i8 = Integer<int8_t>;
+using i16 = Integer<int16_t>;
+using i32 = Integer<int32_t>;
+using i64 = Integer<int64_t>;
+using i128 = Integer<int128>;
 
 }  // namespace numbers
 
