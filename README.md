@@ -15,19 +15,17 @@ numbers
 
 ## Features
 
-- **Full Control**
+- **Full Control** over handling integer overflow
 
-- **Like Primitive Types**
+- Same as **Plain Old Data** (WIP)
 
-- **Signed Integers**: int8 int16 int32 int64 int128
-
-- **Unsigned Integers**: uint8 uint16 uint32 uint64
+- **Support Integers**: i8, i16, i32, i64, u8, u16, u32, u64, even i128 & u128 (not ready yet)
 
 ## Usage
 
 ### operator +
 ```c++
-numbers::int8 a = 100;
+numbers::i8 a = 100;
 std::cout << a << '\n';
 try {
     a = a + a;
@@ -39,9 +37,9 @@ try {
 
 ### checked sub
 ```c++
-numbers::int8 a = numbers::int8::MIN;
+numbers::i8 a = numbers::i8::MIN;
 std::cout << a << '\n';
-std::optional<numbers::int8> ret = a.checked_sub(1);
+std::optional<numbers::i8> ret = a.checked_sub(1);
 if (ret) {
     std::cout << ret.value() << '\n';
 } else {
@@ -51,8 +49,8 @@ if (ret) {
 
 ### overflowing div
 ```c++
-numbers::int16 a = 40;
-numbers::int16 b = 2;
+numbers::i16 a = 40;
+numbers::i16 b = 2;
 auto [ret, overflowing] = a.overflowing_div(b);
 std::cout <<"a= " << a << ", b= " << b << '\n';
 if (!overflowing) {
@@ -64,10 +62,10 @@ if (!overflowing) {
 
 ### saturating mul
 ```c++
-numbers::int64 a = 40;
-numbers::int64 b = numbers::int64::MAX;
+numbers::i64 a = 40;
+numbers::i64 b = numbers::i64::MAX;
 std::cout << "a= " << a << ", b= " << b << '\n';
-numbers::int64 ret = a.saturating_mul(b);
+numbers::i64 ret = a.saturating_mul(b);
 std::cout << ret << '\n';
 ```
 
@@ -75,6 +73,6 @@ std::cout << ret << '\n';
 
 We welcome contributions, but please be aware that the project's design and conventions are still evolving. If you'd like to contribute, it's a good idea to discuss your plans with the project maintainers before starting work.
 
-For the latest updates and discussions, please see our [issues](./issues) and [pull requests](./pulls).
+For the latest updates and discussions, please see our [issues](https://github.com/guuzaa/numbers/issues) and [pull requests](https://github.com/guuzaa/numbers/pulls).
 
 Stay tuned for more updates, and thank you for your interest in contributing to our project!

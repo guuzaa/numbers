@@ -371,10 +371,10 @@ constexpr bool operator==(U lhs, Integer<T> rhs) noexcept {
   return Integer<T>(lhs) == rhs;
 }
 
-using int8 = Integer<int8_t>;
-using int16 = Integer<int16_t>;
-using int32 = Integer<int32_t>;
-using int64 = Integer<int64_t>;
+using i8 = Integer<int8_t>;
+using i16 = Integer<int16_t>;
+using i32 = Integer<int32_t>;
+using i64 = Integer<int64_t>;
 using i128 = Integer<int128>;
 
 }  // namespace numbers

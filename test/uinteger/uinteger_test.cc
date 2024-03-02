@@ -8,21 +8,21 @@
 using namespace numbers;
 
 TEST(UintegerTest, UintegerMinMax) {
-  ASSERT_THROW(-uint64::MAX, std::runtime_error);
-  ASSERT_EQ(-uint16::MIN, uint16::MIN);
-  ASSERT_EQ(uint16::MAX.saturating_add(uint16::MAX), uint16::MAX);
+  ASSERT_THROW(-u64::MAX, std::runtime_error);
+  ASSERT_EQ(-u16::MIN, u16::MIN);
+  ASSERT_EQ(u16::MAX.saturating_add(u16::MAX), u16::MAX);
 }
 
 TEST(UintegerTest, UintegerStringStream) {
   for (unsigned short n = 0; n <= 1000; n++) {
-    uint16 num = n;
+    u16 num = n;
     std::ostringstream stream;
     stream << num;
     ASSERT_EQ(stream.str(), std::to_string(n));
   }
 
   for (unsigned long long n = 0; n < 1000; n++) {
-    uint64 num = n;
+    u64 num = n;
     std::ostringstream stream;
     stream << num;
     ASSERT_EQ(stream.str(), std::to_string(n));
@@ -30,14 +30,14 @@ TEST(UintegerTest, UintegerStringStream) {
 }
 
 TEST(UintegerTest, UintegerAdd) {
-  uint32 num = 10;
-  uint32 num1 = 10;
+  u32 num = 10;
+  u32 num1 = 10;
   ASSERT_EQ(num, num1);
 
-  uint32 num2 = 20;
-  uint32 zero_num = 0;
-  uint32 max_num = uint32::MAX;
-  uint32 min_num = uint32::MIN;
+  u32 num2 = 20;
+  u32 zero_num = 0;
+  u32 max_num = u32::MAX;
+  u32 min_num = u32::MIN;
 
   ASSERT_EQ(zero_num, min_num);
   ASSERT_EQ(num + num1, num2);
@@ -46,9 +46,9 @@ TEST(UintegerTest, UintegerAdd) {
 }
 
 TEST(UintegerTest, UintegerAddNoSideEffects) {
-  uint32 num = 10;
-  uint32 num1 = num;
-  uint32 num2 = num;
+  u32 num = 10;
+  u32 num1 = num;
+  u32 num2 = num;
   ASSERT_EQ(num1, num);
   ASSERT_EQ(num2, num);
 
@@ -59,17 +59,17 @@ TEST(UintegerTest, UintegerAddNoSideEffects) {
 
 TEST(UintegerTest, UintegerWrappingAdd) {
   for (uint16_t n = std::numeric_limits<uint16_t>::min(); n < std::numeric_limits<uint16_t>::max(); n++) {
-    uint16 num = n;
-    ASSERT_EQ(num.wrapping_add(1), uint16(n + 1));
+    u16 num = n;
+    ASSERT_EQ(num.wrapping_add(1), u16(n + 1));
   }
-  uint16 num = uint16::MAX;
-  ASSERT_EQ(num.wrapping_add(1), uint16(uint16::MIN));
+  u16 num = u16::MAX;
+  ASSERT_EQ(num.wrapping_add(1), u16(u16::MIN));
 }
 
 TEST(UintegerTest, UintegerWrappingAddNoSideEffects) {
-  uint32 num = 10;
-  uint32 num1 = num;
-  uint32 num2 = num;
+  u32 num = 10;
+  u32 num1 = num;
+  u32 num2 = num;
   ASSERT_EQ(num1, num);
   ASSERT_EQ(num2, num);
 
@@ -81,10 +81,10 @@ TEST(UintegerTest, UintegerWrappingAddNoSideEffects) {
 
 TEST(UintegerTest, UintegerAddByAccumulate) {
   constexpr size_t len = 100;
-  std::vector<uint64> nums(len);
+  std::vector<u64> nums(len);
   ASSERT_EQ(nums.size(), len);
-  std::iota(nums.begin(), nums.end(), uint64(1));
-  ASSERT_EQ(std::accumulate(nums.begin(), nums.end(), uint64(0)), uint64(5050));
+  std::iota(nums.begin(), nums.end(), u64(1));
+  ASSERT_EQ(std::accumulate(nums.begin(), nums.end(), u64(0)), u64(5050));
 }
 
 TEST(UintegerTest, UintegerCheckedAdd) {
@@ -93,20 +93,20 @@ TEST(UintegerTest, UintegerCheckedAdd) {
   for (int run = 0; run < 100; run++) {
     uint32_t a = random_integer(min, max);
     uint32_t b = random_integer(min, max);
-    uint32 num_a = a;
-    uint32 num_b = b;
+    u32 num_a = a;
+    u32 num_b = b;
     ASSERT_EQ(num_a.checked_add(num_b).value(), a + b);
   }
 
   {
-    uint16 num = 10;
-    uint16 num1 = uint16::MAX;
+    u16 num = 10;
+    u16 num1 = u16::MAX;
     ASSERT_EQ(num.checked_add(num1), std::nullopt);
   }
 
   {
-    uint64 num = 10;
-    uint64 num1 = uint64::MAX;
+    u64 num = 10;
+    u64 num1 = u64::MAX;
     ASSERT_EQ(num.checked_add(num1), std::nullopt);
   }
 
@@ -119,9 +119,9 @@ TEST(UintegerTest, UintegerCheckedAdd) {
 }
 
 TEST(UintegerTest, UintegerCheckedAddNoSideEffects) {
-  uint32 num = 10;
-  uint32 num1 = num;
-  uint32 num2 = num;
+  u32 num = 10;
+  u32 num1 = num;
+  u32 num2 = num;
   ASSERT_EQ(num1, num);
   ASSERT_EQ(num2, num);
 
@@ -137,15 +137,15 @@ TEST(UintegerTest, UintegerOverflowingAdd) {
   for (int run = 0; run < 100; run++) {
     uint32_t a = random_integer(min, max);
     uint32_t b = random_integer(min, max);
-    uint32 num_a = a;
-    uint32 num_b = b;
+    u32 num_a = a;
+    u32 num_b = b;
     auto [ret, flag] = num_a.overflowing_add(num_b);
     ASSERT_FALSE(flag);
     ASSERT_EQ(ret, a + b);
   }
 
   {
-    uint16 num = 10;
+    u16 num = 10;
     Uinteger<unsigned short> num1 = Uinteger<unsigned short>::MAX;
     auto [ret, flag] = num.overflowing_add(num1);
     ASSERT_TRUE(flag);
@@ -153,8 +153,8 @@ TEST(UintegerTest, UintegerOverflowingAdd) {
   }
 
   {
-    uint64 num = 10;
-    uint64 num1 = uint64::MAX;
+    u64 num = 10;
+    u64 num1 = u64::MAX;
     auto [_, flag] = num.overflowing_add(num1);
     ASSERT_TRUE(flag);
   }
@@ -174,9 +174,9 @@ TEST(UintegerTest, UintegerOverflowingAdd) {
 }
 
 TEST(UintegerTest, UintegerOverflowingAddNoSideEffects) {
-  uint32 num = 10;
-  uint32 num1 = num;
-  uint32 num2 = num;
+  u32 num = 10;
+  u32 num1 = num;
+  u32 num2 = num;
   ASSERT_EQ(num1, num);
   ASSERT_EQ(num2, num);
 
@@ -193,33 +193,33 @@ TEST(UintegerTest, UintegerSaturatingAdd) {
   for (int run = 0; run < 100; run++) {
     uint32_t a = random_integer(min, max);
     uint32_t b = random_integer(min, max);
-    uint32 num_a = a;
-    uint32 num_b = b;
+    u32 num_a = a;
+    u32 num_b = b;
     auto ret = num_a.saturating_add(num_b);
     ASSERT_EQ(ret, a + b);
   }
 
   for (uint8_t i = 1; i < std::numeric_limits<uint8_t>::max(); i++) {
-    uint8 num = uint8::MAX;
-    auto ret = num.saturating_add(uint8(i));
-    ASSERT_EQ(ret, uint8(uint8::MAX));
+    u8 num = u8::MAX;
+    auto ret = num.saturating_add(u8(i));
+    ASSERT_EQ(ret, u8(u8::MAX));
   }
 
   {
-    uint64 max_num = uint64::MAX;
+    u64 max_num = u64::MAX;
     auto ret = max_num.saturating_add(max_num);
-    ASSERT_EQ(ret, uint64::MAX);
+    ASSERT_EQ(ret, u64::MAX);
 
-    uint64 min_num = uint64::MIN;
+    u64 min_num = u64::MIN;
     ret = min_num.saturating_add(min_num);
-    ASSERT_EQ(ret, uint64::MIN);
+    ASSERT_EQ(ret, u64::MIN);
   }
 }
 
 TEST(UintegerTest, UintegerSaturatingAddNoSideEffects) {
-  uint32 num = 10;
-  uint32 num1 = num;
-  uint32 num2 = num;
+  u32 num = 10;
+  u32 num1 = num;
+  u32 num2 = num;
   ASSERT_EQ(num1, num);
   ASSERT_EQ(num2, num);
 
@@ -231,30 +231,30 @@ TEST(UintegerTest, UintegerSaturatingAddNoSideEffects) {
 
 TEST(UintegerTest, UintegerAddOverflow) {
   {
-    uint16 num = 10;
-    uint16 num1 = uint16::MAX;
+    u16 num = 10;
+    u16 num1 = u16::MAX;
     ASSERT_THROW(num + num1, std::runtime_error);
   }
 
   {
-    uint64 num = 10;
-    uint64 num1 = uint64::MAX;
+    u64 num = 10;
+    u64 num1 = u64::MAX;
     ASSERT_THROW(num + num1, std::runtime_error);
   }
 }
 
 TEST(UintegerTest, UintegerAddOverflowByAccumulate) {
-  std::vector<uint64> nums(10);
+  std::vector<u64> nums(10);
   ASSERT_EQ(nums.size(), 10);
-  std::iota(nums.begin(), nums.end(), uint64(uint64::MAX - 11));
-  ASSERT_THROW(std::accumulate(nums.begin(), nums.end(), uint64(0)), std::runtime_error);
+  std::iota(nums.begin(), nums.end(), u64(u64::MAX - 11));
+  ASSERT_THROW(std::accumulate(nums.begin(), nums.end(), u64(0)), std::runtime_error);
 }
 
 TEST(UintegerTest, UintegerSub) {
   auto num = 10;
   auto num1 = 10;
   auto num2 = 20;
-  uint32 num3 = uint32::MAX;
+  u32 num3 = u32::MAX;
   auto num4 = 0;
 
   ASSERT_EQ(num2 - num1, num);
@@ -267,17 +267,17 @@ TEST(UintegerTest, UintegerSub) {
   for (int run = 0; run < 100; run++) {
     uint32_t a = random_integer(min, max) + max;
     uint32_t b = random_integer(min, max);
-    uint32 num_a = a;
-    uint32 num_b = b;
-    ASSERT_EQ(uint32(a - b), num_a - num_b);
+    u32 num_a = a;
+    u32 num_b = b;
+    ASSERT_EQ(u32(a - b), num_a - num_b);
     ASSERT_EQ(num_a - num_b, a - b);
   }
 }
 
 TEST(UintegerTest, UintegerSubNoSideEffects) {
-  uint32 num = 10;
-  uint32 num1 = num;
-  uint32 num2 = num;
+  u32 num = 10;
+  u32 num1 = num;
+  u32 num2 = num;
   ASSERT_EQ(num1, num);
   ASSERT_EQ(num2, num);
 
@@ -288,30 +288,30 @@ TEST(UintegerTest, UintegerSubNoSideEffects) {
 
 TEST(UintegerTest, UintegerSubOverflow) {
   for (short n = 1; n < 1000; n++) {
-    uint16 num = n;
-    uint16 num1 = uint16::MIN;
+    u16 num = n;
+    u16 num1 = u16::MIN;
     ASSERT_THROW(num1 - num, std::runtime_error);
   }
 }
 
 TEST(UintegerTest, UintegerCheckedSub) {
   for (short n = 1; n < 1000; n++) {
-    uint16 num = n;
-    uint16 num1 = uint16::MIN;
+    u16 num = n;
+    u16 num1 = u16::MIN;
     ASSERT_EQ(num1.checked_sub(num), std::nullopt);
   }
 
   for (uint16_t n = std::numeric_limits<uint16_t>::max(); n > std::numeric_limits<uint16_t>::min(); n--) {
-    uint16 num = n;
+    u16 num = n;
     auto ret = num.checked_sub(1);
-    ASSERT_EQ(ret.value(), uint16(n - 1));
+    ASSERT_EQ(ret.value(), u16(n - 1));
   }
 }
 
 TEST(UintegerTest, UintegerCheckedSubNoSideEffects) {
-  uint32 num = 10;
-  uint32 num1 = num;
-  uint32 num2 = num;
+  u32 num = 10;
+  u32 num1 = num;
+  u32 num2 = num;
   ASSERT_EQ(num1, num);
   ASSERT_EQ(num2, num);
 
@@ -322,15 +322,15 @@ TEST(UintegerTest, UintegerCheckedSubNoSideEffects) {
 
 TEST(UintegerTest, UintegerOverflowingSub) {
   for (unsigned short n = 1; n < 1000; n++) {
-    uint16 num = n;
-    uint16 num1 = uint16::MIN;
+    u16 num = n;
+    u16 num1 = u16::MIN;
     auto [ret, flag] = num1.overflowing_sub(num);
     ASSERT_TRUE(flag);
     ASSERT_EQ(ret, std::numeric_limits<uint16_t>::min() - n);
   }
 
   for (uint16_t n = std::numeric_limits<uint16_t>::max(); n > std::numeric_limits<uint16_t>::min(); n--) {
-    uint16 num = n;
+    u16 num = n;
     auto [ret, flag] = num.overflowing_sub(1);
     ASSERT_FALSE(flag);
     ASSERT_EQ(ret, n - 1);
@@ -338,9 +338,9 @@ TEST(UintegerTest, UintegerOverflowingSub) {
 }
 
 TEST(UintegerTest, UintegerOverflowingSubNoSideEffects) {
-  uint32 num = 10;
-  uint32 num1 = num;
-  uint32 num2 = num;
+  u32 num = 10;
+  u32 num1 = num;
+  u32 num2 = num;
   ASSERT_EQ(num1, num);
   ASSERT_EQ(num2, num);
 
@@ -353,18 +353,18 @@ TEST(UintegerTest, UintegerOverflowingSubNoSideEffects) {
 
 TEST(UintegerTest, UintegerWrappingSub) {
   for (uint16_t n = std::numeric_limits<uint16_t>::max(); n > std::numeric_limits<uint16_t>::min(); n--) {
-    uint16 num = n;
-    ASSERT_EQ(num.wrapping_sub(1), uint16(n - 1));
+    u16 num = n;
+    ASSERT_EQ(num.wrapping_sub(1), u16(n - 1));
   }
 
-  uint16 num = uint16::MIN;
-  ASSERT_EQ(num.wrapping_sub(1), uint16(uint16::MAX));
+  u16 num = u16::MIN;
+  ASSERT_EQ(num.wrapping_sub(1), u16::MAX);
 }
 
 TEST(UintegerTest, UintegerWarppingSubNoSideEffects) {
-  uint32 num = 10;
-  uint32 num1 = num;
-  uint32 num2 = num;
+  u32 num = 10;
+  u32 num1 = num;
+  u32 num2 = num;
   ASSERT_EQ(num1, num);
   ASSERT_EQ(num2, num);
 
@@ -376,30 +376,30 @@ TEST(UintegerTest, UintegerWarppingSubNoSideEffects) {
 
 TEST(UintegerTest, UintegerSaturatingSub) {
   for (unsigned short n = 1; n <= 1000; n++) {
-    uint16 num = n;
-    uint16 num1 = uint16::MIN;
+    u16 num = n;
+    u16 num1 = u16::MIN;
     auto ret = num1.saturating_sub(num);
-    ASSERT_EQ(ret, uint16::MIN);
+    ASSERT_EQ(ret, u16::MIN);
   }
 
   for (uint16_t n = std::numeric_limits<uint16_t>::max(); n > std::numeric_limits<uint16_t>::min(); n--) {
-    uint16 num = n;
+    u16 num = n;
     auto ret = num.saturating_sub(1);
-    ASSERT_EQ(ret, uint16(n - 1));
+    ASSERT_EQ(ret, u16(n - 1));
   }
 
-  uint16 max_num = uint16::MAX;
-  uint16 min_num = uint16::MIN;
+  u16 max_num = u16::MAX;
+  u16 min_num = u16::MIN;
   auto ret = max_num.saturating_sub(min_num);
-  ASSERT_EQ(ret, uint16::MAX);
+  ASSERT_EQ(ret, u16::MAX);
   ret = min_num.saturating_sub(max_num);
-  ASSERT_EQ(ret, uint16::MIN);
+  ASSERT_EQ(ret, u16::MIN);
 }
 
 TEST(UintegerTest, UintegerSaturatingSubNoSideEffects) {
-  uint32 num = 10;
-  uint32 num1 = num;
-  uint32 num2 = num;
+  u32 num = 10;
+  u32 num1 = num;
+  u32 num2 = num;
   ASSERT_EQ(num1, num);
   ASSERT_EQ(num2, num);
 
@@ -410,10 +410,10 @@ TEST(UintegerTest, UintegerSaturatingSubNoSideEffects) {
 }
 
 TEST(UintegerTest, UintegerMul) {
-  uint64 num = 10;
-  uint64 num1 = 100;
+  u64 num = 10;
+  u64 num1 = 100;
   ASSERT_EQ(num1 * num, 1000);
-  num = uint64::MAX;
+  num = u64::MAX;
   num1 = 0;
   ASSERT_EQ(num1 * num, 0);
   num1 = 1;
@@ -424,17 +424,17 @@ TEST(UintegerTest, UintegerMul) {
   for (int run = 0; run < 100; run++) {
     uint32_t a = random_integer(min, max);
     uint32_t b = random_integer(min, max);
-    uint32 num_a = a;
-    uint32 num_b = b;
-    ASSERT_EQ(uint32(a * b), num_a * num_b);
+    u32 num_a = a;
+    u32 num_b = b;
+    ASSERT_EQ(u32(a * b), num_a * num_b);
     ASSERT_EQ(num_a * num_b, a * b);
   }
 }
 
 TEST(UintegerTest, UintegerMulNoSideEffects) {
-  uint32 num = 10;
-  uint32 num1 = num;
-  uint32 num2 = num;
+  u32 num = 10;
+  u32 num1 = num;
+  u32 num2 = num;
   ASSERT_EQ(num1, num);
   ASSERT_EQ(num2, num);
 
@@ -445,8 +445,8 @@ TEST(UintegerTest, UintegerMulNoSideEffects) {
 }
 
 TEST(UintegerTest, UintegerCheckedMul) {
-  uint8 num = 10;
-  uint8 num1 = 100;
+  u8 num = 10;
+  u8 num1 = 100;
   ASSERT_EQ(num1.checked_mul(num), std::nullopt);
 
   constexpr uint32_t min = 10;
@@ -454,16 +454,16 @@ TEST(UintegerTest, UintegerCheckedMul) {
   for (int run = 0; run < 100; run++) {
     uint32_t a = random_integer(min, max);
     uint32_t b = random_integer(min, max);
-    uint32 num_a = a;
-    uint32 num_b = b;
+    u32 num_a = a;
+    u32 num_b = b;
     ASSERT_EQ(num_a.checked_mul(num_b).value(), a * b);
   }
 }
 
 TEST(UintegerTest, UintegerCheckedMulNoSideEffects) {
-  uint32 num = 10;
-  uint32 num1 = num;
-  uint32 num2 = num;
+  u32 num = 10;
+  u32 num1 = num;
+  u32 num2 = num;
   ASSERT_EQ(num1, num);
   ASSERT_EQ(num2, num);
 
@@ -474,8 +474,8 @@ TEST(UintegerTest, UintegerCheckedMulNoSideEffects) {
 }
 
 TEST(UintegerTest, UintegerOverflowingMul) {
-  uint8 num = 10;
-  uint8 num1 = 100;
+  u8 num = 10;
+  u8 num1 = 100;
   auto [ret, flag] = num1.overflowing_mul(num);
   ASSERT_EQ(ret, uint8_t(10 * 100));
   ASSERT_TRUE(flag);
@@ -485,8 +485,8 @@ TEST(UintegerTest, UintegerOverflowingMul) {
   for (int run = 0; run < 100; run++) {
     uint32_t a = random_integer(min, max);
     uint32_t b = random_integer(min, max);
-    uint32 num_a = a;
-    uint32 num_b = b;
+    u32 num_a = a;
+    u32 num_b = b;
     auto [ret, flag] = num_a.overflowing_mul(num_b);
     ASSERT_FALSE(flag);
     ASSERT_EQ(ret, a * b);
@@ -494,9 +494,9 @@ TEST(UintegerTest, UintegerOverflowingMul) {
 }
 
 TEST(UntegerTest, UintegerOverflowingMulNoSideEffects) {
-  uint32 num = 10;
-  uint32 num1 = num;
-  uint32 num2 = num;
+  u32 num = 10;
+  u32 num1 = num;
+  u32 num2 = num;
   ASSERT_EQ(num1, num);
   ASSERT_EQ(num2, num);
 
@@ -508,14 +508,14 @@ TEST(UntegerTest, UintegerOverflowingMulNoSideEffects) {
 }
 
 TEST(UintegerTest, UintegerSaturatingMul) {
-  uint8 num = 10;
-  uint8 num1 = 100;
-  uint8 ret = num1.saturating_mul(num);
-  ASSERT_EQ(ret, uint8::MAX);
+  u8 num = 10;
+  u8 num1 = 100;
+  u8 ret = num1.saturating_mul(num);
+  ASSERT_EQ(ret, u8::MAX);
 
-  uint16 max_num = uint16::MAX;
-  ASSERT_EQ(max_num.saturating_mul(max_num), uint16::MAX);
-  uint16 min_num = uint16::MIN;
+  u16 max_num = u16::MAX;
+  ASSERT_EQ(max_num.saturating_mul(max_num), u16::MAX);
+  u16 min_num = u16::MIN;
   ASSERT_EQ(min_num.saturating_mul(min_num), min_num);
 
   constexpr uint32_t min = 10;
@@ -523,17 +523,17 @@ TEST(UintegerTest, UintegerSaturatingMul) {
   for (int run = 0; run < 100; run++) {
     uint32_t a = random_integer(min, max);
     uint32_t b = random_integer(min, max);
-    uint32 num_a = a;
-    uint32 num_b = b;
+    u32 num_a = a;
+    u32 num_b = b;
     auto ret = num_a.saturating_mul(num_b);
     ASSERT_EQ(ret, a * b);
   }
 }
 
 TEST(UintegerTest, UintegerSaturatingMulNoSideEffects) {
-  uint32 num = 10;
-  uint32 num1 = num;
-  uint32 num2 = num;
+  u32 num = 10;
+  u32 num1 = num;
+  u32 num2 = num;
   ASSERT_EQ(num1, num);
   ASSERT_EQ(num2, num);
 
@@ -549,17 +549,17 @@ TEST(UintegerTest, UintegerDiv) {
   for (int run = 0; run < 100; run++) {
     uint32_t a = random_integer(min, max);
     uint32_t b = random_integer(min, max);
-    uint32 num_a = a;
-    uint32 num_b = b;
-    ASSERT_EQ(uint32(a / b), num_a / num_b);
+    u32 num_a = a;
+    u32 num_b = b;
+    ASSERT_EQ(u32(a / b), num_a / num_b);
     ASSERT_EQ(num_a / num_b, a / b);
   }
 }
 
 TEST(UintegerTest, UintegerDivNoSideEffects) {
-  uint32 num = 10;
-  uint32 num1 = num;
-  uint32 num2 = num;
+  u32 num = 10;
+  u32 num1 = num;
+  u32 num2 = num;
   ASSERT_EQ(num1, num);
   ASSERT_EQ(num2, num);
 
@@ -570,20 +570,20 @@ TEST(UintegerTest, UintegerDivNoSideEffects) {
 }
 
 TEST(UintegerTest, UintegerWrappingDiv) {
-  uint8 num = 10;
-  uint8 num1 = uint8::MIN;
+  u8 num = 10;
+  u8 num1 = u8::MIN;
   ASSERT_EQ(num1.wrapping_div(num), num1);
 }
 
 TEST(UintegerTest, UintegerWrappingDivNoSideEffects) {
-  uint32 num = 10;
-  uint32 num1 = num;
-  uint32 num2 = num;
+  u32 num = 10;
+  u32 num1 = num;
+  u32 num2 = num;
   ASSERT_EQ(num1, num);
   ASSERT_EQ(num2, num);
 
   auto ret = num2.wrapping_div(num1);
-  ASSERT_EQ(ret, uint32(1));
+  ASSERT_EQ(ret, u32(1));
   ASSERT_EQ(num1, num);
   ASSERT_EQ(num2, num);
 }
@@ -594,16 +594,16 @@ TEST(UintegerTest, UintegerCheckedDiv) {
   for (int run = 0; run < 100; run++) {
     uint32_t a = random_integer(min, max);
     uint32_t b = random_integer(min, max);
-    uint32 num_a = a;
-    uint32 num_b = b;
+    u32 num_a = a;
+    u32 num_b = b;
     EXPECT_EQ(num_a.checked_div(num_b).value(), a / b);
   }
 }
 
 TEST(UintegerTest, UintegerCheckedDivNoSideEffects) {
-  uint32 num = 10;
-  uint32 num1 = num;
-  uint32 num2 = num;
+  u32 num = 10;
+  u32 num1 = num;
+  u32 num2 = num;
   ASSERT_EQ(num1, num);
   ASSERT_EQ(num2, num);
 
@@ -619,8 +619,8 @@ TEST(UintegerTest, UintegerOverflowingDiv) {
   for (int run = 0; run < 100; run++) {
     uint32_t a = random_integer(min, max);
     uint32_t b = random_integer(min, max);
-    uint32 num_a = a;
-    uint32 num_b = b;
+    u32 num_a = a;
+    u32 num_b = b;
     auto [ret, flag] = num_a.overflowing_div(num_b);
     ASSERT_FALSE(flag);
     EXPECT_EQ(ret, a / b);
@@ -628,9 +628,9 @@ TEST(UintegerTest, UintegerOverflowingDiv) {
 }
 
 TEST(UintegerTest, UintegerOverflowingDivNoSideEffects) {
-  uint32 num = 10;
-  uint32 num1 = num;
-  uint32 num2 = num;
+  u32 num = 10;
+  u32 num1 = num;
+  u32 num2 = num;
   ASSERT_EQ(num1, num);
   ASSERT_EQ(num2, num);
 
@@ -646,17 +646,17 @@ TEST(UintegerTest, UintegerSaturatingDiv) {
   for (int run = 0; run < 100; run++) {
     uint32_t a = random_integer(min, max);
     uint32_t b = random_integer(min, max);
-    uint32 num_a = a;
-    uint32 num_b = b;
+    u32 num_a = a;
+    u32 num_b = b;
     auto ret = num_a.saturating_div(num_b);
     EXPECT_EQ(ret, a / b);
   }
 }
 
 TEST(UintegerTest, UintegerSaturatingDivNoSideEffects) {
-  uint32 num = 10;
-  uint32 num1 = num;
-  uint32 num2 = num;
+  u32 num = 10;
+  u32 num1 = num;
+  u32 num2 = num;
   ASSERT_EQ(num1, num);
   ASSERT_EQ(num2, num);
 
@@ -666,7 +666,7 @@ TEST(UintegerTest, UintegerSaturatingDivNoSideEffects) {
 }
 
 TEST(UintegerTest, UintegerNeg) {
-  uint32 num = 0;
+  u32 num = 0;
   ASSERT_EQ(-num, num);
 
   for (uint32_t i = 1; i <= 1000; i += 10) {
@@ -676,8 +676,8 @@ TEST(UintegerTest, UintegerNeg) {
 }
 
 TEST(UintegerTest, UintegerNegNoSideEffects) {
-  uint32 num = 10;
-  uint32 tmp_num = num;
+  u32 num = 10;
+  u32 tmp_num = num;
   ASSERT_EQ(num, tmp_num);
 
   ASSERT_THROW(-num, std::runtime_error);
@@ -686,17 +686,17 @@ TEST(UintegerTest, UintegerNegNoSideEffects) {
 
 TEST(UintegerTest, UintegerCheckedNeg) {
   for (uint32_t i = 1; i <= 1000; i += 10) {
-    uint32 num = i;
+    u32 num = i;
     ASSERT_EQ(num.checked_neg(), std::nullopt);
   }
 
-  uint32 min_num = uint32::MIN;
+  u32 min_num = u32::MIN;
   ASSERT_EQ(min_num.checked_neg(), min_num);
 }
 
 TEST(UintegerTest, UintegerCheckedNegNoSideEffects) {
-  uint32 num = 10;
-  uint32 tmp_num = num;
+  u32 num = 10;
+  u32 tmp_num = num;
   ASSERT_EQ(num, tmp_num);
 
   auto _ = num.checked_neg();
@@ -705,25 +705,25 @@ TEST(UintegerTest, UintegerCheckedNegNoSideEffects) {
 
 TEST(UintegerTest, UintegerOverflowingNeg) {
   for (uint32_t i = 10; i <= 1000; i += 10) {
-    uint32 num = i;
+    u32 num = i;
     auto [ret, flag] = num.overflowing_neg();
     ASSERT_TRUE(flag);
     ASSERT_EQ(ret, -i);
   }
 
-  uint32 max_num = uint32::MAX;
+  u32 max_num = u32::MAX;
   auto [ret, flag] = max_num.overflowing_neg();
   ASSERT_TRUE(flag);
   ASSERT_EQ(ret, -std::numeric_limits<uint32_t>::max());
-  uint32 min_num = uint32::MIN;
+  u32 min_num = u32::MIN;
   std::tie(ret, flag) = min_num.overflowing_neg();
   ASSERT_FALSE(flag);
   ASSERT_EQ(ret, min_num);
 }
 
 TEST(UintegerTest, UintegerOverflowingNegNoSideEffects) {
-  uint32 num = 10;
-  uint32 tmp_num = num;
+  u32 num = 10;
+  u32 tmp_num = num;
   ASSERT_EQ(num, tmp_num);
 
   auto _ = num.overflowing_neg();
@@ -732,19 +732,19 @@ TEST(UintegerTest, UintegerOverflowingNegNoSideEffects) {
 
 TEST(UintegerTest, UintegerWrappingNeg) {
   for (uint32_t i = 10; i <= 1000; i += 10) {
-    uint32 num = i;
+    u32 num = i;
     ASSERT_EQ(num.wrapping_neg(), -i);
   }
 
-  uint32 max_num = uint32::MAX;
+  u32 max_num = u32::MAX;
   ASSERT_EQ(max_num.wrapping_neg(), -std::numeric_limits<uint32_t>::max());
-  uint32 min_num = uint32::MIN;
+  u32 min_num = u32::MIN;
   ASSERT_EQ(min_num.wrapping_neg(), min_num);
 }
 
 TEST(UintegerTest, UintegerWrappingNegNoSideEffects) {
-  uint32 num = 10;
-  uint32 tmp_num = num;
+  u32 num = 10;
+  u32 tmp_num = num;
   ASSERT_EQ(num, tmp_num);
 
   auto _ = num.wrapping_neg();
