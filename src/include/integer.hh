@@ -303,8 +303,18 @@ class Integer {
 
   constexpr bool mul_overflow(T a, T b) const {
     if constexpr (std::is_same_v<T, int128>) {
-      // TODO Unimplemented
-      return false;
+      if (a > 0) {
+        if (b > 0) {
+          return a > max_ / b; // a * b > max_; a positive, b positive
+        } else {
+          return b < min_ / a; // a * b < min_; a positive, b negative
+        }
+      }
+
+      if (b > 0) {
+        return a < min_ / b; // a * b < min_; a negative, b positive
+      }
+      return a != 0 && b < max_ / a; // a * b > max_; a negative, b negative
     } else {
       T res;
       return __builtin_mul_overflow(a, b, &res);
