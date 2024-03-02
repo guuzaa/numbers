@@ -130,7 +130,7 @@ uint128 UnsignedAbsoluteValue(int128 v) { return int128_high64(v) < 0 ? -uint128
 }  // namespace
 
 int128 operator/(int128 lhs, int128 rhs) {
-  assert(lhs != int128::MIN || rhs != -1);  // overflowing
+  // assert(lhs != int128::MIN || rhs != -1);  ignore overflowing
 
   uint128 quotient = 0;
   uint128 remainder = 0;

@@ -305,16 +305,15 @@ class Integer {
     if constexpr (std::is_same_v<T, int128>) {
       if (a > 0) {
         if (b > 0) {
-          return a > max_ / b; // a * b > max_; a positive, b positive
-        } else {
-          return b < min_ / a; // a * b < min_; a positive, b negative
+          return a > max_ / b;  // a * b > max_; a positive, b positive
         }
+        return b < min_ / a;  // a * b < min_; a positive, b not positive
       }
 
       if (b > 0) {
-        return a < min_ / b; // a * b < min_; a negative, b positive
+        return a < min_ / b;  // a * b < min_; a negative, b positive
       }
-      return a != 0 && b < max_ / a; // a * b > max_; a negative, b negative
+      return a != 0 && b < max_ / a;  // a * b > max_; a negative, b not positive
     } else {
       T res;
       return __builtin_mul_overflow(a, b, &res);
