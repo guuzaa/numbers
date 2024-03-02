@@ -9,7 +9,7 @@
 
 namespace numbers {
 
-template <typename T, typename = std::enable_if_t<std::is_signed_v<T>>>
+template <typename T, typename = std::enable_if_t<std::is_signed_v<T> || std::is_same_v<T, int128>>>
 class Integer {
  private:
   constexpr static T min_ = std::numeric_limits<T>::min();
