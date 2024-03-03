@@ -26,11 +26,11 @@ namespace numbers {
 namespace {
 
 inline int Fls128(uint128 n) {
-  if (uint64_t hi = Uint128High64(n)) {
+  if (uint64_t hi = uint128_high64(n)) {
     assert(hi != 0);
     return 127 - countl_zero(hi);
   }
-  const uint64_t low = Uint128Low64(n);
+  const uint64_t low = uint128_low64(n);
   assert(low != 0);
   return 63 - countl_zero(low);
 }
@@ -98,16 +98,16 @@ std::string uint128_to_formatted_string(uint128 v, std::ios_base::fmtflags flags
   DivModImpl(high, div, &high, &low);
   uint128 mid;
   DivModImpl(high, div, &high, &mid);
-  if (Uint128Low64(high) != 0) {
-    os << Uint128Low64(high);
+  if (uint128_low64(high) != 0) {
+    os << uint128_low64(high);
     os << std::noshowbase << std::setfill('0') << std::setw(div_base_log);
-    os << Uint128Low64(mid);
+    os << uint128_low64(mid);
     os << std::setw(div_base_log);
-  } else if (Uint128Low64(mid) != 0) {
-    os << Uint128Low64(mid);
+  } else if (uint128_low64(mid) != 0) {
+    os << uint128_low64(mid);
     os << std::noshowbase << std::setfill('0') << std::setw(div_base_log);
   }
-  os << Uint128Low64(low);
+  os << uint128_low64(low);
   return os.str();
 }
 
@@ -124,6 +124,44 @@ uint128 operator/(uint128 lhs, uint128 rhs) {
   return quotient;
 }
 
+uint128 operator%(uint128 lhs, uint128 rhs) {
+  uint128 quotient = 0;
+  uint128 remainder = 0;
+  DivModImpl(lhs, rhs, &quotient, &remainder);
+  return remainder;
+}
+
+std::string uint128::to_string() const { return uint128_to_formatted_string(*this, std::ios_base::dec); }
+
+std::ostream &operator<<(std::ostream &os, uint128 v) {
+  std::ios_base::fmtflags flags = os.flags();
+  std::string rep = uint128_to_formatted_string(v, flags);
+
+  // Add the requisite padding
+  std::streamsize width = os.width(0);
+  if (static_cast<size_t>(width) > rep.size()) {
+    const size_t count = static_cast<size_t>(width) - rep.size();
+    std::ios::fmtflags adjustfield = flags & std::ios::adjustfield;
+    switch (adjustfield) {
+      case std::ios::left:
+        rep.append(count, os.fill());
+        break;
+      case std::ios::internal:
+        if ((flags & std::ios::basefield) == std::ios::hex && (flags & std::ios::showbase) && v != 0) {
+          rep.insert(size_t{2}, count, os.fill());
+        } else {
+          rep.insert(size_t{0}, count, os.fill());
+        }
+        break;
+      default:  // std::ios::right
+        rep.insert(0, count, os.fill());
+        break;
+    }
+  }
+
+  return os << rep;
+}
+
 namespace {
 uint128 UnsignedAbsoluteValue(int128 v) { return int128_high64(v) < 0 ? -uint128(v) : uint128(v); }
 
@@ -138,7 +176,7 @@ int128 operator/(int128 lhs, int128 rhs) {
   if ((int128_high64(lhs) < 0) != (int128_high64(rhs) < 0)) {
     quotient = -quotient;
   }
-  return make_int128(int128_internal::BitCastToSigned(Uint128High64(quotient)), Uint128Low64(quotient));
+  return make_int128(int128_internal::BitCastToSigned(uint128_high64(quotient)), uint128_low64(quotient));
 }
 
 int128 operator%(int128 lhs, int128 rhs) {
@@ -150,7 +188,7 @@ int128 operator%(int128 lhs, int128 rhs) {
   if (int128_high64(lhs) < 0) {
     remainder = -remainder;
   }
-  return make_int128(int128_internal::BitCastToSigned(Uint128High64(remainder)), Uint128Low64(remainder));
+  return make_int128(int128_internal::BitCastToSigned(uint128_high64(remainder)), uint128_low64(remainder));
 }
 
 std::ostream &operator<<(std::ostream &os, int128 v) {
@@ -194,8 +232,6 @@ std::ostream &operator<<(std::ostream &os, int128 v) {
   return os << rep;
 }
 
-std::string int128::to_string() const {
-  return uint128_to_formatted_string(*this, std::ios_base::dec);
-}
+std::string int128::to_string() const { return uint128_to_formatted_string(*this, std::ios_base::dec); }
 
 }  // namespace numbers

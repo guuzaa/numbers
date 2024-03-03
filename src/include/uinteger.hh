@@ -11,7 +11,7 @@ namespace numbers {
 
 namespace {
 
-template <typename T, typename = std::enable_if_t<std::is_unsigned_v<T>>>
+template <typename T, typename = std::enable_if_t<std::is_unsigned_v<T> || std::is_same_v<T, uint128>>>
 class Uinteger {
  private:
   constexpr static T min_ = std::numeric_limits<T>::min();
@@ -221,7 +221,7 @@ using u8 = Uinteger<uint8_t>;
 using u16 = Uinteger<uint16_t>;
 using u32 = Uinteger<uint32_t>;
 using u64 = Uinteger<uint64_t>;
-// using u128 = Uinteger<uint128>;
+using u128 = Uinteger<uint128>;
 
 }  // namespace numbers
 

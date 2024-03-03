@@ -289,6 +289,9 @@ TEST(i128OverflowTest, DivThrow) {
   b = -b;
   EXPECT_NO_THROW(c / b);  // -/-
   EXPECT_NO_THROW(b / c);  // -/-
+
+  numbers::i128 zero = 0;
+  EXPECT_DEATH(a / zero, "Assertion failed");
 }
 
 TEST(i128OverflowTest, CheckedDiv) {
