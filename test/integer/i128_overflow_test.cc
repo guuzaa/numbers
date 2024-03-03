@@ -109,6 +109,9 @@ TEST(i128OverflowTest, SubThrow) {
   EXPECT_EQ(min - min, 0);
   EXPECT_EQ(max -= max, 0);
   EXPECT_EQ(min -= min, 0);
+
+  numbers::i128 a = 123;
+  EXPECT_EQ(123 - a, 0);
 }
 
 TEST(i128OverflowTest, CheckedSub) {

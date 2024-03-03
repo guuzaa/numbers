@@ -2,10 +2,29 @@
 
 #include "gtest/gtest.h"
 
-#include "uinteger.hh"
 #include "test/utils.hh"
+#include "uinteger.hh"
 
 using namespace numbers;
+
+typedef ::testing::Types<u8, u16, u32, u64, u128> Uintegers;
+
+template <typename T>
+class uintegerTest : public ::testing::Test {};
+
+TYPED_TEST_SUITE(uintegerTest, Uintegers);
+
+TYPED_TEST(uintegerTest, BoolConversion) {
+  EXPECT_FALSE(TypeParam(0));
+  for (int i = 0; i < sizeof(TypeParam); ++i) {
+    EXPECT_TRUE(TypeParam(1) << i);
+  }
+
+  EXPECT_FALSE(TypeParam::MIN);
+  EXPECT_TRUE(TypeParam::MAX);
+  EXPECT_EQ(TypeParam(1), TypeParam(true));
+  EXPECT_EQ(TypeParam(0), TypeParam(false));
+}
 
 TEST(UintegerTest, UintegerMinMax) {
   ASSERT_THROW(-u64::MAX, std::runtime_error);
