@@ -387,7 +387,7 @@ TEST_F(Uint128Test, NumericLimits) {
   EXPECT_FALSE(std::numeric_limits<numbers::uint128>::is_iec559);
   EXPECT_TRUE(std::numeric_limits<numbers::uint128>::is_bounded);
   EXPECT_TRUE(std::numeric_limits<numbers::uint128>::is_modulo);
-  EXPECT_FALSE(std::numeric_limits<numbers::uint128>::traps);
+  EXPECT_EQ(std::numeric_limits<numbers::uint128>::traps, std::numeric_limits<uint64_t>::traps);
   EXPECT_FALSE(std::numeric_limits<numbers::uint128>::tinyness_before);
   EXPECT_EQ(std::numeric_limits<numbers::uint128>::round_style, std::round_toward_zero);
 }

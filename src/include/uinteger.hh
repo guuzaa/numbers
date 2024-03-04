@@ -45,7 +45,7 @@ class Uinteger {
 
   constexpr Uinteger<T> saturating_add(const Uinteger<T> &other) const noexcept {
     if (add_overflow(num_, other.num_)) {
-      return Uinteger(MAX);
+      return MAX;
     }
     return Uinteger(num_ + other.num_);
   }
