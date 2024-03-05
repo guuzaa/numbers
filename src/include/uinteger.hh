@@ -252,8 +252,15 @@ class Uinteger {
   constexpr bool div_overflow(T a, T b) const noexcept { return false; }
 
   constexpr bool mul_overflow(T a, T b) const {
-    T res;
-    return __builtin_mul_overflow(a, b, &res);
+    if constexpr (std::is_same_v<T, uint128>) {
+      if (a == 0 || b == 0) {
+        return false;
+      }
+      return (max_ / a) < b;
+    } else {
+      T res;
+      return __builtin_mul_overflow(a, b, &res);
+    }
   }
 
   T num_;

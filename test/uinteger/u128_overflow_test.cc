@@ -159,3 +159,236 @@ TEST(u128OverflowTest, OverflowingAndWrappingSub) {
   EXPECT_TRUE(flag);
   EXPECT_EQ(ret, c.wrapping_sub(a));
 }
+
+TEST(u128OverflowTest, MulThrow) {
+  numbers::u128 min = numbers::u128::MIN;
+  numbers::u128 max = numbers::u128::MAX;
+  EXPECT_THROW(max * 12, std::runtime_error);
+  EXPECT_NO_THROW(max * 1);
+  EXPECT_NO_THROW(min * 345);
+
+  numbers::u128 large = numbers::make_uint128(1, 0);
+  numbers::u128 larger = numbers::make_uint128(2, 0);
+  EXPECT_NO_THROW(large * 2);
+  EXPECT_EQ(large * 2, larger);
+  EXPECT_THROW(large * larger, std::runtime_error);
+}
+
+TEST(u128OverflowTest, CheckedMul) {
+  numbers::u128 min = numbers::u128::MIN;
+  numbers::u128 max = numbers::u128::MAX;
+  auto ret = max.checked_mul(123);
+  EXPECT_EQ(ret, std::nullopt);
+  ret = max.checked_mul(456);
+  EXPECT_EQ(ret, std::nullopt);
+  ret = min.checked_mul(34);
+  EXPECT_EQ(ret, min);
+
+  numbers::u128 large = numbers::make_uint128(1, 0);
+  numbers::u128 larger = numbers::make_uint128(2, 0);
+  ret = large.checked_mul(2);
+  EXPECT_EQ(ret, larger);
+  ret = large.checked_mul(larger);
+  EXPECT_EQ(ret, std::nullopt);
+}
+
+TEST(u128OverflowTest, SaturatingMul) {
+  numbers::u128 min = numbers::u128::MIN;
+  numbers::u128 max = numbers::u128::MAX;
+  auto ret = max.saturating_mul(123);
+  EXPECT_EQ(ret, max);
+  ret = max.saturating_mul(445);
+  EXPECT_EQ(ret, max);
+  ret = min.saturating_mul(34);
+  EXPECT_EQ(ret, min);
+
+  numbers::u128 large = numbers::make_uint128(1, 0);
+  numbers::u128 larger = numbers::make_uint128(2, 0);
+  ret = large.saturating_mul(2);
+  EXPECT_EQ(ret, larger);
+  ret = large.saturating_mul(larger);
+  EXPECT_EQ(ret, max);
+}
+
+TEST(u128OverflowTest, OverflowingMul) {
+  numbers::u128 min = numbers::u128::MIN;
+  numbers::u128 max = numbers::u128::MAX;
+  auto [ret, flag] = max.overflowing_mul(123);
+  EXPECT_TRUE(flag);
+
+  std::tie(ret, flag) = min.overflowing_mul(34);
+  EXPECT_FALSE(flag);
+
+  numbers::u128 large = numbers::make_uint128(1, 0);
+  numbers::u128 larger = numbers::make_uint128(2, 0);
+  std::tie(ret, flag) = large.overflowing_mul(2);
+  EXPECT_FALSE(flag);
+  EXPECT_EQ(ret, larger);
+  std::tie(ret, flag) = large.overflowing_mul(larger);
+  EXPECT_TRUE(flag);
+}
+
+TEST(u128OverflowTest, WrappingMul) {
+  numbers::u128 min = numbers::u128::MIN;
+  numbers::u128 max = numbers::u128::MAX;
+  numbers::u128 a = 345;
+  numbers::u128 b = 12;
+
+  auto [ret, flag] = max.overflowing_mul(a);
+  EXPECT_TRUE(flag);
+  EXPECT_EQ(ret, max.wrapping_mul(a));
+
+  std::tie(ret, flag) = min.overflowing_mul(b);
+  EXPECT_FALSE(flag);
+  EXPECT_EQ(ret, min.wrapping_mul(b));
+
+  EXPECT_EQ(a.wrapping_mul(b), a * b);  // +, +
+  EXPECT_EQ(b.wrapping_mul(a), b * a);
+
+  numbers::u128 large = numbers::make_uint128(1, 0);
+  numbers::u128 larger = numbers::make_uint128(2, 0);
+  std::tie(ret, flag) = large.overflowing_mul(2);
+  EXPECT_FALSE(flag);
+  EXPECT_EQ(ret, large.wrapping_mul(2));
+  std::tie(ret, flag) = large.overflowing_mul(larger);
+  EXPECT_TRUE(flag);
+  EXPECT_EQ(ret, large.wrapping_mul(larger));
+}
+
+TEST(u128OverflowTest, DivThrow) {
+  numbers::u128 max = numbers::u128::MAX;
+  EXPECT_NO_THROW(max / 100);
+
+  numbers::u128 a = 123;
+  numbers::u128 b = 456;
+  numbers::u128 c = 789;
+
+  EXPECT_NO_THROW(a / b); 
+  EXPECT_NO_THROW(b / a);
+
+  EXPECT_NO_THROW(a / c);
+  EXPECT_NO_THROW(c / a);
+
+  EXPECT_NO_THROW(c / b);
+  EXPECT_NO_THROW(b / c);
+
+  numbers::u128 zero = 0;
+  EXPECT_DEATH(a / zero, "");
+}
+
+TEST(u128OverflowTest, CheckedDiv) {
+  numbers::u128 a = 321;
+  numbers::u128 b = 564;
+  numbers::u128 c = 798;
+  EXPECT_EQ(a.checked_div(b).value(), a / b);
+  EXPECT_EQ(b.checked_div(a).value(), b / a);
+
+  EXPECT_EQ(a.checked_div(c).value(), a / c);
+  EXPECT_EQ(c.checked_div(b).value(), c / b);
+
+  EXPECT_EQ(c.checked_div(a).value(), c / a);
+
+  numbers::u128 zero = 0;
+  EXPECT_DEATH(a.checked_div(zero), "");
+}
+
+TEST(u128OverflowTest, SaturatingDiv) {
+  numbers::u128 a = 21;
+  numbers::u128 b = 56;
+  numbers::u128 c = 78;
+  EXPECT_EQ(a.saturating_div(b), a / b);
+  EXPECT_EQ(b.saturating_div(a), b / a);
+
+  EXPECT_EQ(a.saturating_div(c), a / c);
+  EXPECT_EQ(c.saturating_div(b), c / b);
+  EXPECT_EQ(c.saturating_div(a), c / a);
+
+  numbers::u128 zero = 0;
+  EXPECT_DEATH(a.saturating_div(zero), "");
+}
+
+TEST(u128OverflowTest, OverflowingDiv) {
+  numbers::u128 a = 21;
+  numbers::u128 b = 56;
+  numbers::u128 c = 789;
+
+  auto [ret, flag] = a.overflowing_div(b);
+  EXPECT_FALSE(flag);
+  EXPECT_EQ(ret, a / b);
+
+  std::tie(ret, flag) = b.overflowing_div(a);
+  EXPECT_FALSE(flag);
+  EXPECT_EQ(ret, b / a);
+
+  std::tie(ret, flag) = a.overflowing_div(c);
+  EXPECT_FALSE(flag);
+  EXPECT_EQ(ret, a / c);
+
+  std::tie(ret, flag) = c.overflowing_div(b);
+  EXPECT_FALSE(flag);
+  EXPECT_EQ(ret, c / b);
+
+  numbers::u128 zero = 0;
+  EXPECT_DEATH(a.overflowing_div(zero), "");
+}
+
+TEST(u128OverflowTest, WrappingDiv) {
+  numbers::u128 a = numbers::make_int128(21, 0);
+  numbers::u128 b = 56;
+  numbers::u128 c = 789;
+
+  auto [ret, flag] = a.overflowing_div(b);
+  EXPECT_FALSE(flag);
+  EXPECT_EQ(ret, a.wrapping_div(b));
+
+  std::tie(ret, flag) = b.overflowing_div(a);
+  EXPECT_FALSE(flag);
+  EXPECT_EQ(ret, b.wrapping_div(a));
+
+  std::tie(ret, flag) = a.overflowing_div(c);
+  EXPECT_FALSE(flag);
+  EXPECT_EQ(ret, a.wrapping_div(c));
+
+  std::tie(ret, flag) = c.overflowing_div(b);
+  EXPECT_FALSE(flag);
+  EXPECT_EQ(ret, c.wrapping_div(b));
+
+  numbers::u128 zero = 0;
+  EXPECT_DEATH(a.wrapping_div(zero), "");
+}
+
+TEST(u128OverflowTest, NegThrow) {
+  numbers::u128 min = numbers::u128::MIN;
+  numbers::u128 max = numbers::u128::MAX;
+  EXPECT_THROW(-max, std::runtime_error);
+  EXPECT_NO_THROW(-min);
+  numbers::u128 a = 4578;
+  EXPECT_THROW(-a, std::runtime_error);
+}
+
+TEST(u128OverflowTest, CheckedNeg) {
+  numbers::u128 min = numbers::u128::MIN;
+  numbers::u128 max = numbers::u128::MAX;
+  EXPECT_EQ(max.checked_neg(), std::nullopt);
+  EXPECT_EQ(min.checked_neg(), min);
+
+  numbers::u128 a = 94578;
+  EXPECT_EQ(a.checked_neg(), std::nullopt);
+}
+
+TEST(u128OverflowTest, OverflowingAndWrappingNeg) {
+  numbers::u128 min = numbers::u128::MIN;
+  numbers::u128 max = numbers::u128::MAX;
+  auto [ret, flag] = max.overflowing_neg();
+  EXPECT_TRUE(flag);
+  EXPECT_EQ(ret, max.wrapping_neg());
+
+  std::tie(ret, flag) = min.overflowing_neg();
+  EXPECT_FALSE(flag);
+  EXPECT_EQ(ret, min);
+
+  numbers::u128 a = 93458;
+  std::tie(ret, flag) = a.overflowing_neg();
+  EXPECT_TRUE(flag);
+  EXPECT_EQ(ret, a.wrapping_neg());
+}
