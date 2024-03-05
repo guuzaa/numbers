@@ -47,6 +47,14 @@ void i128_example() {
   std::cout << "max - a = " << ret << '\n';
 }
 
+void uint128_example() {
+  std::cout << "==== uint128_example ==== \n";
+  numbers::uint128 a = numbers::uint128(0) - 1;
+  numbers::uint128 max = std::numeric_limits<numbers::uint128>::max();
+  numbers::uint128 min = std::numeric_limits<numbers::uint128>::min();
+  std::cout << "a= " << a << ", max= " << max << ", min= " << min << '\n';
+}
+
 int main(int argc, char const *argv[]) {
   auto a = 100;
   std::cout << a << '\n';
@@ -81,6 +89,7 @@ int main(int argc, char const *argv[]) {
   overflowing_div_example();
   saturating_mul_example();
   i128_example();
+  uint128_example();
 
   return 0;
 }

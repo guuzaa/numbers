@@ -1,3 +1,19 @@
+// Copyright 2017 The Abseil Authors.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      https://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+// Modified from abseil-app guuzaa 2024
+
 #include "gtest/gtest.h"
 
 #include <numeric>
@@ -397,11 +413,7 @@ TEST(Int128Test, BitwiseLogic) {
   EXPECT_EQ(int128(-1), ~int128(0));
 
   int128 values[] = {
-      0,
-      -1,
-      0xde400bee05c3ff6b,
-      make_int128(0x7f32178dd81d634a, 0),
-      make_int128(0xaf539057055613a, 0x7d104d7d946c2e4d),
+      0, -1, 0xde400bee05c3ff6b, make_int128(0x7f32178dd81d634a, 0), make_int128(0xaf539057055613a, 0x7d104d7d946c2e4d),
   };
   for (auto val : values) {
     SCOPED_TRACE(::testing::Message() << "val: " << val);
