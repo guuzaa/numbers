@@ -23,7 +23,6 @@ foreach (example_source ${EXAMPLE_SOURCES})
             RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/examples"
             COMMAND ${example_name}
     )
-    list(APPEND ALL_EXAMPLES ${example_name})
 
     add_custom_target(example-${example_name}
         COMMENT "Running example ${example_name}..."
