@@ -39,7 +39,7 @@ jobs:
         cmake --build ${{ matrix.build-dir }}
     - name: Example
       run: |
-        cmake --build ${{ matrix.build-dir }} example
+        cmake --build ${{ matrix.build-dir }} --target example
     - name: Test
       run: |
-        cmake --build ${{ matrix.build-dir }} run-tests
+        cmake --build ${{ matrix.build-dir }} --target run-tests
