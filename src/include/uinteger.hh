@@ -6,6 +6,7 @@
 #include <optional>
 #include <type_traits>
 #include "int128.hh"
+#include "internal/config.h"
 
 namespace numbers {
 
@@ -251,15 +252,23 @@ class Uinteger {
 
   constexpr bool div_overflow(T a, T b) const noexcept { return false; }
 
-  constexpr bool mul_overflow(T a, T b) const {
-    if constexpr (std::is_same_v<T, uint128>) {
+  constexpr bool mul_overflow_helper(T a, T b) const {
       if (a == 0 || b == 0) {
         return false;
       }
       return (max_ / a) < b;
+  }
+
+  constexpr bool mul_overflow(T a, T b) const {
+    if constexpr (std::is_same_v<T, uint128>) {
+      return mul_overflow_helper(a, b);
     } else {
+#if NUMBERS_HAVE_BUILTIN(__builtin_mul_overflow)
       T res;
       return __builtin_mul_overflow(a, b, &res);
+#else
+      return mul_overflow_helper(a, b);
+#endif
     }
   }
 

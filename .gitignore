@@ -10,3 +10,7 @@ distribute/*
 cmake_build
 .cmake_build
 cmake-build-*
+
+# Visual Studio
+out/
+.vs/
