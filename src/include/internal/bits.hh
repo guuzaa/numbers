@@ -49,9 +49,9 @@ inline int count_leading_zeroes32(uint32_t x) {
 }
 
 inline int count_leading_zeroes16(uint16_t x) {
-#if NUMBERS_INTERNAL_HAVE_BUILTIN_OR_GCC(__builtin_clzs)
+#if NUMBERS_INTERNAL_HAVE_BUILTIN_OR_GCC(__builtin_clz)
   static_assert(sizeof(unsigned short) == sizeof(x), "__builtin_clz does not take 16-bit argument");
-  return x == 0 ? 16 : __builtin_clzs(x) - 16;
+  return x == 0 ? 16 : __builtin_clz(x) - 16;
 #else
   return count_leading_zeroes32(x) - 16;
 #endif
