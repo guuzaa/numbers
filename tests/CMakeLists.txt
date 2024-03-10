@@ -2,7 +2,7 @@ enable_testing()
 
 include(GoogleTest)
 
-set(SRC_TEST_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/test/include)
+set(SRC_TEST_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/tests/include)
 include_directories(${SRC_TEST_INCLUDE_DIR})
 
 add_subdirectory(utils)
