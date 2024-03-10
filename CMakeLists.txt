@@ -12,7 +12,7 @@ endif()
 
 option(NUMBERS_TEST "Build and perform numbers tests" ${PROJECT_IS_TOP_LEVEL})
 
-set(version 0.0.1)
+set(version 0.0.2)
 
 project(numbers VERSION ${version} LANGUAGES CXX)
 

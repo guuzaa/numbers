@@ -17,7 +17,7 @@ numbers
 
 - **Full Control** over handling integer overflow
 
-- Same as **Plain Old Data** (WIP)
+- Same as **Primitive Types** (WIP)
 
 - **Support Integers**: i8, i16, i32, i64, u8, u16, u32, u64, even i128 & u128 (not ready yet)
 

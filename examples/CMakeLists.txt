@@ -11,8 +11,8 @@ foreach (example_source ${EXAMPLE_SOURCES})
 
     add_custom_command(
         TARGET example
-        COMMAND $<TARGET_FILE:${example_name}>
         COMMENT "Running example ${example_name}..."
+        COMMAND $<TARGET_FILE:${example_name}>
         USES_TERMINAL
     )
 
