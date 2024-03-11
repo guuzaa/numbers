@@ -17,8 +17,13 @@ class Integer {
   constexpr static T max_ = std::numeric_limits<T>::max();
 
  public:
+#if defined(__MSC_VER)
+  static Integer<T> MIN;
+  static Integer<T> MAX;
+#else
   inline static Integer<T> MIN = Integer<T>(min_);
   inline static Integer<T> MAX = Integer<T>(max_);
+#endif
 
   constexpr Integer() noexcept : num_{} {}
   template <typename U, typename = std::enable_if<std::is_convertible_v<U, T> && std::is_signed_v<U>>>
@@ -303,17 +308,17 @@ class Integer {
   constexpr bool div_overflow(T a, T b) const noexcept { return a == min_ && b == -1; }
 
   constexpr bool mul_overflow_helper(T a, T b) const {
-      if (a > 0) {
-        if (b > 0) {
-          return a > max_ / b;  // a * b > max_; a positive, b positive
-        }
-        return b < min_ / a;  // a * b < min_; a positive, b not positive
-      }
-
+    if (a > 0) {
       if (b > 0) {
-        return a < min_ / b;  // a * b < min_; a negative, b positive
+        return a > max_ / b;  // a * b > max_; a positive, b positive
       }
-      return a != 0 && b < max_ / a;  // a * b > max_; a negative, b not positive
+      return b < min_ / a;  // a * b < min_; a positive, b not positive
+    }
+
+    if (b > 0) {
+      return a < min_ / b;  // a * b < min_; a negative, b positive
+    }
+    return a != 0 && b < max_ / a;  // a * b > max_; a negative, b not positive
   }
 
   constexpr bool mul_overflow(T a, T b) const {

@@ -17,8 +17,13 @@ class Uinteger {
   constexpr static T max_ = std::numeric_limits<T>::max();
 
  public:
+#if defined(__MSC_VER)
+  static Uinteger<T> MIN;
+  static Uinteger<T> MAX;
+#else
   inline static Uinteger<T> MIN = Uinteger(min_);
   inline static Uinteger<T> MAX = Uinteger(max_);
+#endif
 
   constexpr Uinteger() noexcept : num_{} {}
   template <typename U, typename = std::enable_if<std::is_convertible_v<U, T> && std::is_integral_v<U>>>
