@@ -1,6 +1,6 @@
 #include "uinteger.hh"
 
-#if defined(__MSC_VER)
+#if defined(_MSC_VER)
 namespace numbers {
 template <>
 u8 u8::MAX = u8(max_);
