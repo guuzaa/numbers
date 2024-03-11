@@ -17,7 +17,7 @@ class Uinteger {
   constexpr static T max_ = std::numeric_limits<T>::max();
 
  public:
-#if defined(__MSC_VER)
+#if defined(_MSC_VER)
   static Uinteger<T> MIN;
   static Uinteger<T> MAX;
 #else
