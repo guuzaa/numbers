@@ -11,6 +11,7 @@ jobs:
     name: Build and Test on ${{ matrix.os }} with ${{ matrix.compiler }}
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
         include:
@@ -28,7 +29,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - uses: ilammy/msvc-dev-cmd@v1
+    - name: Setup MSVC Dev Environment
+      if: runner.os == 'Windows'
+      uses: ilammy/msvc-dev-cmd@v1
     - name: Install dependencies
       run: ${{ matrix.install }}
     - name: Configure
@@ -37,9 +40,9 @@ jobs:
     - name: Build
       run: |
         cmake --build ${{ matrix.build-dir }}
-    - name: Example
-      run: |
-        cmake --build ${{ matrix.build-dir }} --target example
     - name: Test
       run: |
         cmake --build ${{ matrix.build-dir }} --target run-tests
+    - name: Example
+      run: |
+        cmake --build ${{ matrix.build-dir }} --target example
