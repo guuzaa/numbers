@@ -11,35 +11,39 @@ jobs:
     name: Build and Test on ${{ matrix.os }} with ${{ matrix.compiler }}
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os: [ubuntu-latest, macos-latest, windows-latest]
         include:
           - os: ubuntu-latest
             compiler: GCC
-            install: sudo apt-get update && sudo apt-get install -y build-essential
+            install: sudo apt-get update && sudo apt-get install -y build-essential ninja-build
             build-dir: build-gcc
           - os: macos-latest
             compiler: Clang
-            install: ""
+            install: "brew install ninja"
             build-dir: build-clang
+          - os: windows-latest
+            compiler: MSVC
+            install: "choco install ninja"
+            build-dir: build-msvc
 
     steps:
     - uses: actions/checkout@v4
+    - name: Setup MSVC Dev Environment
+      if: runner.os == 'Windows'
+      uses: ilammy/msvc-dev-cmd@v1
     - name: Install dependencies
       run: ${{ matrix.install }}
     - name: Configure
       run: |
-        mkdir ${{ matrix.build-dir }} && cd ${{ matrix.build-dir }}
-        cmake ..
+        cmake -B ${{ matrix.build-dir }} -G Ninja
     - name: Build
       run: |
-        cd ${{ matrix.build-dir }}
-        make -j
-    - name: Example
-      run: |
-        cd ${{ matrix.build-dir }}
-        make example
+        cmake --build ${{ matrix.build-dir }}
     - name: Test
       run: |
-        cd ${{ matrix.build-dir }}
-        make run-tests
+        cmake --build ${{ matrix.build-dir }} --target run-tests
+    - name: Example
+      run: |
+        cmake --build ${{ matrix.build-dir }} --target example

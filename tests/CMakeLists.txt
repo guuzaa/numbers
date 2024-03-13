@@ -13,13 +13,13 @@ add_custom_target(tests)
 add_dependencies(tests test_utils integer_test uinteger_test)
 
 add_custom_target(run-tests
-    COMMAND ${CMAKE_CTEST_COMMAND}
-    DEPENDS ${TEST_TARGETS} tests
+    COMMAND ${CMAKE_CTEST_COMMAND} -C Debug
+    DEPENDS ${TEST_TARGETS} tests uinteger_test integer_test
     COMMENT "Build and Run All Tests..."
 )
 
 add_custom_target(check-tests
-    COMMAND ${CMAKE_CTEST_COMMAND} --verbose
+    COMMAND ${CMAKE_CTEST_COMMAND} -C Debug --verbose
     DEPENDS ${TEST_TARGETS} 
     COMMENT "Running All Tests..."
 )

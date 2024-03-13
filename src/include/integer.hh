@@ -6,6 +6,7 @@
 #include <optional>
 #include <type_traits>
 #include "int128.hh"
+#include "internal/config.h"
 
 namespace numbers {
 
@@ -16,11 +17,17 @@ class Integer {
   constexpr static T max_ = std::numeric_limits<T>::max();
 
  public:
+#if defined(_MSC_VER)
+  static Integer<T> MIN;
+  static Integer<T> MAX;
+#else
   inline static Integer<T> MIN = Integer<T>(min_);
   inline static Integer<T> MAX = Integer<T>(max_);
+#endif
 
   constexpr Integer() noexcept : num_{} {}
-  template <typename U, typename = std::enable_if<std::is_convertible_v<U, T> && std::is_signed_v<U>>>
+
+  template <typename U, typename = std::enable_if_t<std::is_convertible_v<U, T>>>
   Integer(U num) noexcept : num_{static_cast<T>(num)} {}
 
   constexpr Integer operator+(Integer<T> other) const noexcept(false) {
@@ -301,22 +308,30 @@ class Integer {
 
   constexpr bool div_overflow(T a, T b) const noexcept { return a == min_ && b == -1; }
 
+  constexpr bool mul_overflow_helper(T a, T b) const {
+    if (a > 0) {
+      if (b > 0) {
+        return a > max_ / b;  // a * b > max_; a positive, b positive
+      }
+      return b < min_ / a;  // a * b < min_; a positive, b not positive
+    }
+
+    if (b > 0) {
+      return a < min_ / b;  // a * b < min_; a negative, b positive
+    }
+    return a != 0 && b < max_ / a;  // a * b > max_; a negative, b not positive
+  }
+
   constexpr bool mul_overflow(T a, T b) const {
     if constexpr (std::is_same_v<T, int128>) {
-      if (a > 0) {
-        if (b > 0) {
-          return a > max_ / b;  // a * b > max_; a positive, b positive
-        }
-        return b < min_ / a;  // a * b < min_; a positive, b not positive
-      }
-
-      if (b > 0) {
-        return a < min_ / b;  // a * b < min_; a negative, b positive
-      }
-      return a != 0 && b < max_ / a;  // a * b > max_; a negative, b not positive
+      return mul_overflow_helper(a, b);
     } else {
+#if NUMBERS_HAVE_BUILTIN(__builtin_mul_overflow)
       T res;
       return __builtin_mul_overflow(a, b, &res);
+#else
+      return mul_overflow_helper(a, b);
+#endif
     }
   }
 
