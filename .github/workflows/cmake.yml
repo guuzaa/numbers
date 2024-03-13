@@ -17,7 +17,7 @@ jobs:
         include:
           - os: ubuntu-latest
             compiler: GCC
-            install: sudo apt-get update && sudo apt-get install -y build-essential ninja
+            install: sudo apt-get update && sudo apt-get install -y build-essential ninja-build
             build-dir: build-gcc
           - os: macos-latest
             compiler: Clang
