@@ -26,7 +26,8 @@ class Integer {
 #endif
 
   constexpr Integer() noexcept : num_{} {}
-  template <typename U, typename = std::enable_if<std::is_convertible_v<U, T> && std::is_signed_v<U>>>
+
+  template <typename U, typename = std::enable_if_t<std::is_convertible_v<U, T>>>
   Integer(U num) noexcept : num_{static_cast<T>(num)} {}
 
   constexpr Integer operator+(Integer<T> other) const noexcept(false) {

@@ -1,6 +1,6 @@
+#if defined(_MSC_VER)
 #include "integer.hh"
 
-#if defined(_MSC_VER)
 namespace numbers {
 template <>
 i8 i8::MAX = i8(max_);

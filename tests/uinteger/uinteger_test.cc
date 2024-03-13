@@ -130,9 +130,9 @@ TEST(UintegerTest, UintegerCheckedAdd) {
   }
 
   {
-    Uinteger<unsigned long> num1 = Uinteger<unsigned long>::MIN;
+    u8 num1 = u8::MIN;
     ASSERT_EQ(num1.checked_add(num1).value(), num1);
-    Uinteger<unsigned long> num2 = Uinteger<unsigned long>::MAX;
+    u8 num2 = u8::MAX;
     ASSERT_EQ(num2.checked_add(num2), std::nullopt);
   }
 }
@@ -165,7 +165,7 @@ TEST(UintegerTest, UintegerOverflowingAdd) {
 
   {
     u16 num = 10;
-    Uinteger<unsigned short> num1 = Uinteger<unsigned short>::MAX;
+    u16 num1 = u16::MAX;
     auto [ret, flag] = num.overflowing_add(num1);
     ASSERT_TRUE(flag);
     ASSERT_EQ(ret, 10 + std::numeric_limits<unsigned short>::max());
@@ -179,14 +179,14 @@ TEST(UintegerTest, UintegerOverflowingAdd) {
   }
 
   {
-    Uinteger<unsigned long> num1 = Uinteger<unsigned long>::MIN;
+    u64 num1 = u64::MIN;
     auto [ret, flag1] = num1.overflowing_add(num1);
     ASSERT_FALSE(flag1);
     ASSERT_EQ(ret, num1);
   }
 
   {
-    Uinteger<unsigned long> num2 = Uinteger<unsigned long>::MAX;
+    u64 num2 = u64::MAX;
     auto [_, flag2] = num2.overflowing_add(num2);
     ASSERT_TRUE(flag2);
   }

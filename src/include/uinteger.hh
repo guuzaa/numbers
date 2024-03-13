@@ -26,7 +26,8 @@ class Uinteger {
 #endif
 
   constexpr Uinteger() noexcept : num_{} {}
-  template <typename U, typename = std::enable_if<std::is_convertible_v<U, T> && std::is_integral_v<U>>>
+
+  template <typename U, typename = std::enable_if_t<std::is_convertible_v<U, T>>>
   Uinteger(U num) noexcept : num_{static_cast<T>(num)} {}
 
   constexpr Uinteger operator+(const Uinteger<T> &other) const noexcept(false) {
