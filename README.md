@@ -7,11 +7,12 @@ numbers
 [![license mit](https://img.shields.io/badge/License-MIT-pink)](https://github.com/guuzaa/numbers/blob/main/LICENSE.txt)
 ![linux](https://img.shields.io/badge/OS-Linux-blue)
 ![macOS](https://img.shields.io/badge/OS-macOS-blue)
+![windows](https://img.shields.io/badge/OS-Windows-blue)
 
 > [!IMPORTANT]  
 > This project is in the early stages of development. The codebase is subject to significant changes and reorganization. Expect breaking changes as we refine the architecture, fix bugs, and implement new features.
 
-`numbers` is a library for C++17 and later versions that handles integer overflow similar to Rust. It simplifies integer computations and offers control over how to handle overflow situations.
+`numbers` is a library for C++17 and later versions that handles integer overflow similar to Rust. It simplifies integer overflow situations.
 
 ## Features
 
