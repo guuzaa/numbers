@@ -17,14 +17,15 @@ jobs:
         include:
           - os: ubuntu-latest
             compiler: GCC
-            install: sudo apt-get update && sudo apt-get install -y build-essential
+            install: sudo apt-get update && sudo apt-get install -y build-essential ninja
             build-dir: build-gcc
           - os: macos-latest
             compiler: Clang
-            install: ""
+            install: "brew install ninja"
             build-dir: build-clang
           - os: windows-latest
             compiler: MSVC
+            install: "choco install ninja"
             build-dir: build-msvc
 
     steps:
@@ -36,7 +37,7 @@ jobs:
       run: ${{ matrix.install }}
     - name: Configure
       run: |
-        cmake -B ${{ matrix.build-dir }}
+        cmake -B ${{ matrix.build-dir }} -G Ninja
     - name: Build
       run: |
         cmake --build ${{ matrix.build-dir }}
