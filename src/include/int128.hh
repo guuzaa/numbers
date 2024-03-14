@@ -135,6 +135,13 @@ constexpr uint128 uint128_max() {
 // Specialized numeric_limits for uint128.
 namespace std {
 template <>
+struct hash<numbers::uint128> {
+  size_t operator()(const numbers::uint128 &obj) const {
+    return std::hash<uint64_t>()(uint128_high64(obj)) ^ std::hash<uint64_t>()(uint128_low64(obj));
+  }
+};
+
+template <>
 class numeric_limits<numbers::uint128> {
  public:
   static constexpr bool is_specialized = true;
@@ -309,6 +316,13 @@ inline int128 int128::MIN = int128_min();
 namespace std {
 template <>
 struct is_signed<numbers::int128> : std::true_type {};
+
+template <>
+struct hash<numbers::int128> {
+  size_t operator()(const numbers::int128 &obj) const {
+    return std::hash<int64_t>()(int128_high64(obj)) ^ std::hash<uint64_t>()(int128_low64(obj));
+  }
+};
 
 template <>
 class numeric_limits<numbers::int128> {

@@ -484,3 +484,14 @@ TEST(Int128Test, NumericLimits) {
   EXPECT_EQ(int128_min(), std::numeric_limits<int128>::lowest());
   EXPECT_EQ(int128_max(), std::numeric_limits<int128>::max());
 }
+
+TEST(Int128Test, Hash) {
+  int128 a = make_int128(34, 56);
+  int128 b = a;
+  std::hash<int128> hasher;
+
+  EXPECT_EQ(hasher(a), hasher(a));
+  EXPECT_EQ(hasher(b), hasher(b));
+
+  EXPECT_EQ(hasher(a), hasher(b));
+}
