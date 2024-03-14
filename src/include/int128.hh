@@ -137,7 +137,7 @@ namespace std {
 template <>
 struct hash<numbers::uint128> {
   size_t operator()(const numbers::uint128 &obj) const {
-    return std::hash<uint64_t>()(uint128_high64(obj)) ^ std::hash<uint64_t>()(uint128_low64(obj));
+    return (std::hash<uint64_t>()(uint128_high64(obj)) << 1) ^ std::hash<uint64_t>()(uint128_low64(obj));
   }
 };
 
@@ -320,7 +320,7 @@ struct is_signed<numbers::int128> : std::true_type {};
 template <>
 struct hash<numbers::int128> {
   size_t operator()(const numbers::int128 &obj) const {
-    return std::hash<int64_t>()(int128_high64(obj)) ^ std::hash<uint64_t>()(int128_low64(obj));
+    return std::hash<int64_t>()(int128_high64(obj) << 1) ^ std::hash<uint64_t>()(int128_low64(obj));
   }
 };
 
