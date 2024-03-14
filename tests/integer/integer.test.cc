@@ -1128,3 +1128,14 @@ TEST(integerTest, integerSaturatingNegNoSideEffects) {
   auto _ = num.saturating_neg();
   ASSERT_EQ(num, tmp_num);
 }
+
+TEST(integerTest, Hash) {
+  i64 a = 4567983;
+  i64 b = a;
+  std::hash<i64> hasher;
+
+  EXPECT_EQ(hasher(a), hasher(a));
+  EXPECT_EQ(hasher(b), hasher(b));
+
+  EXPECT_EQ(hasher(a), hasher(b));
+}

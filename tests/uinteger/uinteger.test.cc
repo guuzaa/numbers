@@ -769,3 +769,14 @@ TEST(UintegerTest, UintegerWrappingNegNoSideEffects) {
   auto _ = num.wrapping_neg();
   ASSERT_EQ(num, tmp_num);
 }
+
+TEST(UintegerTest, Hash) {
+  u32 a = 1245679;
+  u32 b = a;
+  std::hash<u32> hasher;
+
+  EXPECT_EQ(hasher(a), hasher(a));
+  EXPECT_EQ(hasher(b), hasher(b));
+
+  EXPECT_EQ(hasher(a), hasher(b));
+}
