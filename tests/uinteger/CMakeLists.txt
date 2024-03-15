@@ -1,4 +1,4 @@
-file(GLOB_RECURSE test_files "${CMAKE_CURRENT_SOURCE_DIR}/*test.cc")
+file(GLOB_RECURSE test_files "${CMAKE_CURRENT_SOURCE_DIR}/*.test.cc")
 
 set(PROJECT_NAME uinteger_test)
 

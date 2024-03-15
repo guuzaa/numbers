@@ -392,4 +392,17 @@ TEST_F(Uint128Test, NumericLimits) {
   EXPECT_EQ(std::numeric_limits<numbers::uint128>::round_style, std::round_toward_zero);
 }
 
+TEST_F(Uint128Test, Hash) {
+  using namespace numbers;
+
+  uint128 a = make_uint128(56, 78);
+  uint128 b = a;
+  std::hash<uint128> hasher;
+
+  EXPECT_EQ(hasher(a), hasher(a));
+  EXPECT_EQ(hasher(b), hasher(b));
+
+  EXPECT_EQ(hasher(a), hasher(b));
+}
+
 }  // namespace

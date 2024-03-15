@@ -1,5 +1,5 @@
-#ifndef HEADER_INTEGER_H
-#define HEADER_INTEGER_H
+#ifndef NUMBERS_INTEGER_HH
+#define NUMBERS_INTEGER_HH
 
 #include <iostream>
 #include <limits>
@@ -408,5 +408,34 @@ using i64 = Integer<int64_t>;
 using i128 = Integer<int128>;
 
 }  // namespace numbers
+
+namespace std {
+template <>
+struct hash<numbers::i8> {
+  size_t operator()(const numbers::i8 &obj) const { return std::hash<int8_t>()(static_cast<int8_t>(obj)); }
+};
+
+template <>
+struct hash<numbers::i16> {
+  size_t operator()(const numbers::i16 &obj) const { return std::hash<int16_t>()(static_cast<int16_t>(obj)); }
+};
+
+template <>
+struct hash<numbers::i32> {
+  size_t operator()(const numbers::i32 &obj) const { return std::hash<int32_t>()(static_cast<int32_t>(obj)); }
+};
+
+template <>
+struct hash<numbers::i64> {
+  size_t operator()(const numbers::i64 &obj) const { return std::hash<int64_t>()(static_cast<int64_t>(obj)); }
+};
+
+// TODO hash collision
+template <>
+struct hash<numbers::i128> {
+  size_t operator()(const numbers::i128 &obj) const { return std::hash<numbers::int128>()(static_cast<numbers::int128>(obj)); }
+};
+
+}  // namespace std
 
 #endif

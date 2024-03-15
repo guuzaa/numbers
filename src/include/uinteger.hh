@@ -1,5 +1,5 @@
-#ifndef HEADER_UNINTEGER_H
-#define HEADER_UNINTEGER_H
+#ifndef NUMBERS_UNINTEGER_HH
+#define NUMBERS_UNINTEGER_HH
 
 #include <iostream>
 #include <limits>
@@ -347,5 +347,34 @@ using u64 = Uinteger<uint64_t>;
 using u128 = Uinteger<uint128>;
 
 }  // namespace numbers
+
+namespace std {
+template <>
+struct hash<numbers::u8> {
+  size_t operator()(const numbers::u8 &obj) const { return std::hash<uint8_t>()(static_cast<uint8_t>(obj)); }
+};
+
+template <>
+struct hash<numbers::u16> {
+  size_t operator()(const numbers::u16 &obj) const { return std::hash<uint16_t>()(static_cast<uint16_t>(obj)); }
+};
+
+template <>
+struct hash<numbers::u32> {
+  size_t operator()(const numbers::u32 &obj) const { return std::hash<uint32_t>()(static_cast<uint32_t>(obj)); }
+};
+
+template <>
+struct hash<numbers::u64> {
+  size_t operator()(const numbers::u64 &obj) const { return std::hash<uint64_t>()(static_cast<uint64_t>(obj)); }
+};
+
+// TODO hash collision
+template <>
+struct hash<numbers::u128> {
+  size_t operator()(const numbers::u128 &obj) const { return std::hash<numbers::uint128>()(static_cast<numbers::uint128>(obj)); }
+};
+
+}  // namespace std
 
 #endif
