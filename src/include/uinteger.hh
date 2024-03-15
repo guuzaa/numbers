@@ -1,5 +1,5 @@
-#ifndef HEADER_UNINTEGER_H
-#define HEADER_UNINTEGER_H
+#ifndef NUMBERS_UNINTEGER_HH
+#define NUMBERS_UNINTEGER_HH
 
 #include <iostream>
 #include <limits>

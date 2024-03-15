@@ -1,5 +1,5 @@
-#ifndef HEADER_INTEGER_H
-#define HEADER_INTEGER_H
+#ifndef NUMBERS_INTEGER_HH
+#define NUMBERS_INTEGER_HH
 
 #include <iostream>
 #include <limits>
