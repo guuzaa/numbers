@@ -1,4 +1,5 @@
 #include <numeric>
+#include <unordered_set>
 #include <vector>
 #include "gtest/gtest.h"
 
@@ -1138,4 +1139,15 @@ TEST(integerTest, Hash) {
   EXPECT_EQ(hasher(b), hasher(b));
 
   EXPECT_EQ(hasher(a), hasher(b));
+}
+
+TEST(integerTest, UnorderedSet) {
+  std::unordered_set<i8> s8;
+  size_t cnt = 0;
+  for (i8 i = 0; i < i8::MAX; i = i.saturating_add(17)) {
+    s8.insert(i);
+    ++cnt;
+    ASSERT_EQ(s8.size(), cnt);
+    ASSERT_EQ(s8.count(i), 1);
+  }
 }

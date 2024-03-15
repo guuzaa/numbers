@@ -2,6 +2,7 @@
 
 #include "gtest/gtest.h"
 
+#include <unordered_set>
 #include "test/utils.hh"
 #include "uinteger.hh"
 
@@ -779,4 +780,15 @@ TEST(UintegerTest, Hash) {
   EXPECT_EQ(hasher(b), hasher(b));
 
   EXPECT_EQ(hasher(a), hasher(b));
+}
+
+TEST(UintegerTest, UnorderedSet) {
+  std::unordered_set<u8> s8;
+  size_t cnt  = 0;
+  for (u8 i = u8::MIN; i < u8::MAX; i = i.saturating_add(19)) {
+    s8.insert(i);
+    ++cnt;
+    ASSERT_EQ(s8.size(), cnt);
+    ASSERT_EQ(s8.count(i), 1);
+  }
 }

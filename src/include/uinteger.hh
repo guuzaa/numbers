@@ -369,6 +369,7 @@ struct hash<numbers::u64> {
   size_t operator()(const numbers::u64 &obj) const { return std::hash<uint64_t>()(static_cast<uint64_t>(obj)); }
 };
 
+// TODO hash collision
 template <>
 struct hash<numbers::u128> {
   size_t operator()(const numbers::u128 &obj) const { return std::hash<numbers::uint128>()(static_cast<numbers::uint128>(obj)); }
