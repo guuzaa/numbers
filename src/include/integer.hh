@@ -210,9 +210,11 @@ class Integer {
     return Integer(-num_);
   }
 
-  constexpr bool operator==(const Integer<T> &other) const noexcept { return num_ == other.num_; }
-  constexpr bool operator<(const Integer<T> &other) const noexcept { return num_ < other.num_; }
-  constexpr bool operator>(const Integer<T> &other) const noexcept { return num_ > other.num_; }
+  constexpr bool operator==(Integer<T> other) const noexcept { return num_ == other.num_; }
+  constexpr bool operator<(Integer<T> other) const noexcept { return num_ < other.num_; }
+  constexpr bool operator>(Integer<T> other) const noexcept { return num_ > other.num_; }
+  constexpr bool operator<=(Integer<T> other) const noexcept { return num_ <= other.num_; }
+  constexpr bool operator>=(Integer<T> other) const noexcept { return num_ >= other.num_; }
 
   Integer &operator+=(Integer other) {
     *this = *this + other;
@@ -399,6 +401,26 @@ constexpr bool operator!=(Integer<T> lhs, Integer<T> rhs) {
 template <typename U, typename T, typename = std::enable_if_t<std::is_signed_v<U> && std::is_convertible_v<U, T>>>
 constexpr bool operator==(U lhs, Integer<T> rhs) noexcept {
   return Integer<T>(lhs) == rhs;
+}
+
+template <typename U, typename T, typename = std::enable_if_t<std::is_signed_v<U> && std::is_convertible_v<U, T>>>
+constexpr bool operator>(U lhs, Integer<T> rhs) noexcept {
+  return Integer<T>(lhs) > rhs;
+}
+
+template <typename U, typename T, typename = std::enable_if_t<std::is_signed_v<U> && std::is_convertible_v<U, T>>>
+constexpr bool operator>=(U lhs, Integer<T> rhs) noexcept {
+  return Integer<T>(lhs) >= rhs;
+}
+
+template <typename U, typename T, typename = std::enable_if_t<std::is_signed_v<U> && std::is_convertible_v<U, T>>>
+constexpr bool operator<(U lhs, Integer<T> rhs) noexcept {
+  return Integer<T>(lhs) < rhs;
+}
+
+template <typename U, typename T, typename = std::enable_if_t<std::is_signed_v<U> && std::is_convertible_v<U, T>>>
+constexpr bool operator<=(U lhs, Integer<T> rhs) noexcept {
+  return Integer<T>(lhs) <= rhs;
 }
 
 using i8 = Integer<int8_t>;
