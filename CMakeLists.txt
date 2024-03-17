@@ -1,22 +1,27 @@
 cmake_minimum_required(VERSION 3.10)
 
-set(BUILD_SHARED_LIBS OFF)
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-set(version 0.0.2)
+set(version 0.0.3)
 
 project(numbers VERSION ${version} LANGUAGES CXX)
 
+set(BUILD_SHARED_LIBS OFF)
+
 string(COMPARE EQUAL ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_SOURCE_DIR} PROJECT_IS_TOP_LEVEL)
 
-if (PROJECT_IS_TOP_LEVEL)
-        message(STATUS "Project is top level")
+set(CMAKE_EXPORT_COMPILE_COMMANDS ${PROJECT_IS_TOP_LEVEL})
+
+if (PROJECT_IS_TOP_LEVEL) 
+        set(CMAKE_CXX_STANDARD 17)
+        set(CMAKE_CXX_STANDARD_REQUIRED ON)
+        message(STATUS "Project ${PROJECT_NAME} is top level")
 endif()
 
-option(NUMBERS_TEST "Build and perform numbers tests" ${PROJECT_IS_TOP_LEVEL})
+# Check if the compiler supports C++17
+if(NOT CMAKE_CXX_STANDARD OR CMAKE_CXX_STANDARD LESS 17)
+        message(FATAL_ERROR  "Error: ${PROJECT_NAME} is a library for C++17 and later versions.")
+endif()
 
-set(CMAKE_EXPORT_COMPILE_COMMANDS ${PROJECT_IS_TOP_LEVEL})
+option(NUMBERS_TEST "Build and perform ${PROJECT_NAME} tests" ${PROJECT_IS_TOP_LEVEL})
 
 # Includes.
 set(SRC_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/src/include)

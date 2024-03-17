@@ -6,6 +6,7 @@
 void for_error() {
   size_t i;
 
+  // error - infinite loop
   for (i = 10; i >= 0; i--) {
     printf("[ID %u] Hello, World\n", i);
   }
