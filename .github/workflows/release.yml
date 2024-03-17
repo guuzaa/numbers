@@ -1,0 +1,23 @@
+name: Release
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create build environment
+        run: cmake -B build-release
+      - name: Package source code
+        working-directory: build-release/
+        run: cmake --build . --target package
+      - name: Add packaged source code to release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: build-release/numbers-src.zip
+          tag: ${{ github.ref }}

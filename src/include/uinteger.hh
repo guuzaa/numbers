@@ -169,6 +169,8 @@ class Uinteger {
   constexpr bool operator==(Uinteger<T> other) const noexcept { return num_ == other.num_; }
   constexpr bool operator<(Uinteger<T> other) const noexcept { return num_ < other.num_; }
   constexpr bool operator>(Uinteger<T> other) const noexcept { return num_ > other.num_; }
+  constexpr bool operator<=(Uinteger<T> other) const noexcept { return num_ <= other.num_; }
+  constexpr bool operator>=(Uinteger<T> other) const noexcept { return num_ >= other.num_; }
 
   Uinteger &operator+=(Uinteger other) {
     *this = *this + other;
@@ -338,6 +340,26 @@ constexpr bool operator!=(Uinteger<T> lhs, Uinteger<T> rhs) {
 template <typename U, typename T, typename = std::enable_if_t<std::is_convertible_v<U, T>>>
 constexpr bool operator==(U lhs, Uinteger<T> rhs) noexcept {
   return Uinteger<T>(lhs) == rhs;
+}
+
+template <typename U, typename T, typename = std::enable_if_t< std::is_convertible_v<U, T>>>
+constexpr bool operator>(U lhs, Uinteger<T> rhs) noexcept {
+  return Uinteger<T>(lhs) > rhs;
+}
+
+template <typename U, typename T, typename = std::enable_if_t<std::is_convertible_v<U, T>>>
+constexpr bool operator>=(U lhs, Uinteger<T> rhs) noexcept {
+  return Uinteger<T>(lhs) >= rhs;
+}
+
+template <typename U, typename T, typename = std::enable_if_t<std::is_convertible_v<U, T>>>
+constexpr bool operator<(U lhs, Uinteger<T> rhs) noexcept {
+  return Uinteger<T>(lhs) < rhs;
+}
+
+template <typename U, typename T, typename = std::enable_if_t<std::is_convertible_v<U, T>>>
+constexpr bool operator<=(U lhs, Uinteger<T> rhs) noexcept {
+  return Uinteger<T>(lhs) <= rhs;
 }
 
 using u8 = Uinteger<uint8_t>;
