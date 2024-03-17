@@ -6,14 +6,14 @@ project(numbers VERSION ${version} LANGUAGES CXX)
 
 set(BUILD_SHARED_LIBS OFF)
 
-string(COMPARE EQUAL ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_SOURCE_DIR} PROJECT_IS_TOP_LEVEL)
+string(COMPARE EQUAL ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_SOURCE_DIR} PROJECT_IS_IN_ROOT)
 
-set(CMAKE_EXPORT_COMPILE_COMMANDS ${PROJECT_IS_TOP_LEVEL})
+set(CMAKE_EXPORT_COMPILE_COMMANDS ${PROJECT_IS_IN_ROOT})
 
-if(PROJECT_IS_TOP_LEVEL)
+if(PROJECT_IS_IN_ROOT)
     set(CMAKE_CXX_STANDARD 17)
     set(CMAKE_CXX_STANDARD_REQUIRED ON)
-    message(STATUS "Project ${PROJECT_NAME} is top level")
+    message(STATUS "Project ${PROJECT_NAME} is in root")
 endif()
 
 # Check if the compiler supports C++17
@@ -21,7 +21,8 @@ if(NOT CMAKE_CXX_STANDARD OR CMAKE_CXX_STANDARD LESS 17)
     message(FATAL_ERROR "Error: ${PROJECT_NAME} is a library for C++17 and later versions.")
 endif()
 
-option(NUMBERS_TEST "Build and perform ${PROJECT_NAME} tests" ${PROJECT_IS_TOP_LEVEL})
+option(NUMBERS_TEST "Build and perform ${PROJECT_NAME} tests" ${PROJECT_IS_IN_ROOT})
+option(NUMBERS_EXAMPLE "Build and perform ${PROJECT_NAME} examples" ${PROJECT_IS_IN_ROOT})
 
 # Includes.
 set(SRC_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/src/include)
@@ -30,6 +31,10 @@ include_directories(${SRC_INCLUDE_DIR})
 
 add_subdirectory(src)
 
+if(NUMBERS_EXAMPLE)
+    add_subdirectory(examples)
+endif()
+
 if(NUMBERS_TEST)
     message(STATUS "Building and running tests")
     set(THIRD_PARTY_INCLUDE_DIR
@@ -37,7 +42,6 @@ if(NUMBERS_TEST)
     )
     include_directories(${THIRD_PARTY_INCLUDE_DIR})
 
-    add_subdirectory(examples)
     add_subdirectory(third_party)
     add_subdirectory(tests)
 
