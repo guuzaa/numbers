@@ -19,6 +19,11 @@ gtest_discover_tests(${PROJECT_NAME}
     TIMEOUT 120
 )
 
+add_custom_target(test-integer
+    COMMENT "Running test ${PROJECT_NAME}..."
+    COMMAND ${PROJECT_NAME}
+)
+
 set_target_properties(${PROJECT_NAME}
     PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/test"

@@ -792,3 +792,16 @@ TEST(UintegerTest, UnorderedSet) {
     ASSERT_EQ(s8.count(i), 1);
   }
 }
+
+TEST(UintegerTest, ModuloArithmetic) {
+  unsigned int i_a = 5678;
+  u64 a = i_a;
+  u64 b = a * 2;
+
+  EXPECT_EQ(i_a % b, a);
+  EXPECT_EQ(a % b, a);
+  EXPECT_EQ(b % a, 0);
+  EXPECT_EQ(b % i_a, 0);
+  ++b;
+  EXPECT_EQ(b % a, 1);
+}

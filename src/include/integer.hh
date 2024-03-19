@@ -140,6 +140,10 @@ class Integer {
     return Integer(num_ * other.num_);
   }
 
+  constexpr Integer operator%(const Integer<T> &other) const {
+    return Integer(num_ % other.num_);
+  }
+
   constexpr Integer abs() const noexcept(false) {
     if (num_ == min_) {
       throw std::runtime_error("abs overflow");
@@ -386,6 +390,17 @@ constexpr Integer<T> &operator*=(Integer<T> lhs, Integer<T> rhs) noexcept(false)
 template <typename U, typename T, typename = std::enable_if_t<std::is_signed_v<U> && std::is_convertible_v<U, T>>>
 constexpr Integer<T> operator*(U lhs, Integer<T> rhs) noexcept(false) {
   return Integer<T>(lhs) * rhs;
+}
+
+template <typename T>
+constexpr Integer<T> &operator%=(Integer<T> lhs, Integer<T> rhs) noexcept(false) {
+  lhs = lhs % rhs;
+  return lhs;
+}
+
+template <typename U, typename T, typename = std::enable_if_t<std::is_signed_v<U> && std::is_convertible_v<U, T>>>
+constexpr Integer<T> operator%(U lhs, Integer<T> rhs) noexcept(false) {
+  return Integer<T>(lhs) % rhs;
 }
 
 template <typename T>

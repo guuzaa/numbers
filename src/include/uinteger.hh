@@ -138,6 +138,10 @@ class Uinteger {
     return Uinteger(num_ * other.num_);
   }
 
+  constexpr Uinteger operator%(const Uinteger<T> &other) const {
+    return Uinteger(num_ % other.num_);
+  }
+
   constexpr Uinteger operator-() const noexcept(false) {
     if (num_ == min_) {
       return Uinteger(num_);
@@ -314,6 +318,17 @@ constexpr Uinteger<T> &operator/=(Uinteger<T> lhs, Uinteger<T> rhs) noexcept(fal
 template <typename U, typename T, typename = std::enable_if_t<std::is_convertible_v<U, T>>>
 constexpr Uinteger<T> operator/(U lhs, Uinteger<T> rhs) noexcept(false) {
   return Uinteger<T>(lhs) / rhs;
+}
+
+template <typename T>
+constexpr Uinteger<T> &operator%=(Uinteger<T> lhs, Uinteger<T> rhs) noexcept(false) {
+  lhs = lhs % rhs;
+  return lhs;
+}
+
+template <typename U, typename T, typename = std::enable_if_t<std::is_convertible_v<U, T>>>
+constexpr Uinteger<T> operator%(U lhs, Uinteger<T> rhs) noexcept(false) {
+  return Uinteger<T>(lhs) % rhs;
 }
 
 template <typename T>

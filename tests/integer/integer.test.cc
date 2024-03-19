@@ -1151,3 +1151,16 @@ TEST(integerTest, UnorderedSet) {
     ASSERT_EQ(s8.count(i), 1);
   }
 }
+
+TEST(integerTest, ModuloArithmetic) {
+  int i_a = 1234;
+  i64 a = i_a;
+  i64 b = a * 2;
+
+  EXPECT_EQ(i_a % b, a);
+  EXPECT_EQ(a % b, a);
+  EXPECT_EQ(b % a, 0);
+  EXPECT_EQ(b % i_a, 0);
+  ++b;
+  EXPECT_EQ(b % a, 1);
+}
