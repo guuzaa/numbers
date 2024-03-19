@@ -32,11 +32,12 @@ include_directories(${SRC_INCLUDE_DIR})
 add_subdirectory(src)
 
 if(NUMBERS_EXAMPLE)
+    message(STATUS "Building examples")
     add_subdirectory(examples)
 endif()
 
 if(NUMBERS_TEST)
-    message(STATUS "Building and running tests")
+    message(STATUS "Building tests")
     set(THIRD_PARTY_INCLUDE_DIR
         ${PROJECT_SOURCE_DIR}/third_party
     )
