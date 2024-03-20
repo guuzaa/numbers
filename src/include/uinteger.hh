@@ -216,6 +216,26 @@ class Uinteger {
     return *this;
   }
 
+  Uinteger operator&(Uinteger other) { return Uinteger(num_ & other.num_); }
+  Uinteger operator&=(Uinteger other) {
+    num_ &= other.num_;
+    return *this;
+  }
+
+  Uinteger operator|(Uinteger other) { return Uinteger(num_ | other.num_); }
+  Uinteger operator|=(Uinteger other) {
+    num_ |= other.num_;
+    return *this;
+  }
+
+  Uinteger operator^(Uinteger other) { return Uinteger(num_ ^ other.num_); }
+  Uinteger operator^=(Uinteger other) {
+    num_ ^= other.num_;
+    return *this;
+  }
+
+  Uinteger operator~() { return Uinteger(~num_); }
+
   // prefix ++
   constexpr Uinteger &operator++() noexcept(false) {
     *this += 1;
@@ -375,6 +395,21 @@ constexpr bool operator<(U lhs, Uinteger<T> rhs) noexcept {
 template <typename U, typename T, typename = std::enable_if_t<std::is_convertible_v<U, T>>>
 constexpr bool operator<=(U lhs, Uinteger<T> rhs) noexcept {
   return Uinteger<T>(lhs) <= rhs;
+}
+
+template <typename U, typename T, typename = std::enable_if_t<std::is_signed_v<U> && std::is_convertible_v<U, T>>>
+constexpr Uinteger<T> operator&(U lhs, Uinteger<T> rhs) {
+  return Uinteger<T>(lhs) & rhs;
+}
+
+template <typename U, typename T, typename = std::enable_if_t<std::is_signed_v<U> && std::is_convertible_v<U, T>>>
+constexpr Uinteger<T> operator|(U lhs, Uinteger<T> rhs) {
+  return Uinteger<T>(lhs) | rhs;
+}
+
+template <typename U, typename T, typename = std::enable_if_t<std::is_signed_v<U> && std::is_convertible_v<U, T>>>
+constexpr Uinteger<T> operator^(U lhs, Uinteger<T> rhs) {
+  return Uinteger<T>(lhs) ^ rhs;
 }
 
 using u8 = Uinteger<uint8_t>;

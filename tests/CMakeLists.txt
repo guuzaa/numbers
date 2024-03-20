@@ -9,11 +9,8 @@ add_subdirectory(utils)
 
 set(test_dir_list "${CMAKE_CURRENT_SOURCE_DIR}/integer" "${CMAKE_CURRENT_SOURCE_DIR}/uinteger")
 foreach(test_dir ${test_dir_list}) 
-    message(STATUS "test_dir: ${test_dir}")
-
     file(GLOB_RECURSE test_files "${test_dir}/*.test.cc")
     get_filename_component(dir_name ${test_dir} NAME)
-    message(STATUS "dir_name: ${dir_name}")
 
     set(PROJECT_NAME ${dir_name}_test)
 

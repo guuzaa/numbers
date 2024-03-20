@@ -260,6 +260,26 @@ class Integer {
     return *this;
   }
 
+  Integer operator&(Integer other) { return Integer(num_ & other.num_); }
+  Integer operator&=(Integer other) {
+    num_ &= other.num_;
+    return *this;
+  }
+
+  Integer operator|(Integer other) { return Integer(num_ | other.num_); }
+  Integer operator|=(Integer other) {
+    num_ |= other.num_;
+    return *this;
+  }
+
+  Integer operator^(Integer other) { return Integer(num_ ^ other.num_); }
+  Integer operator^=(Integer other) {
+    num_ ^= other.num_;
+    return *this;
+  }
+
+  Integer operator~() { return Integer(~num_); }
+
   // prefix ++
   Integer &operator++() noexcept(false) {
     *this += Integer(1);
@@ -436,6 +456,21 @@ constexpr bool operator<(U lhs, Integer<T> rhs) noexcept {
 template <typename U, typename T, typename = std::enable_if_t<std::is_signed_v<U> && std::is_convertible_v<U, T>>>
 constexpr bool operator<=(U lhs, Integer<T> rhs) noexcept {
   return Integer<T>(lhs) <= rhs;
+}
+
+template <typename U, typename T, typename = std::enable_if_t<std::is_signed_v<U> && std::is_convertible_v<U, T>>>
+constexpr Integer<T> operator&(U lhs, Integer<T> rhs) {
+  return Integer<T>(lhs) & rhs;
+}
+
+template <typename U, typename T, typename = std::enable_if_t<std::is_signed_v<U> && std::is_convertible_v<U, T>>>
+constexpr Integer<T> operator|(U lhs, Integer<T> rhs) {
+  return Integer<T>(lhs) | rhs;
+}
+
+template <typename U, typename T, typename = std::enable_if_t<std::is_signed_v<U> && std::is_convertible_v<U, T>>>
+constexpr Integer<T> operator^(U lhs, Integer<T> rhs) {
+  return Integer<T>(lhs) ^ rhs;
 }
 
 using i8 = Integer<int8_t>;

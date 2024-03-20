@@ -805,3 +805,28 @@ TEST(UintegerTest, ModuloArithmetic) {
   ++b;
   EXPECT_EQ(b % a, 1);
 }
+
+TEST(UintegerTest, BitOperations) {
+  u64 u_a = 1;
+  u64 u_b = 1 << 2;
+  u64 a = u_a;
+  u64 b = u_b;
+  EXPECT_EQ(a & b, 0);
+  EXPECT_EQ(u_a & b, 0);
+  EXPECT_EQ(a & b, 0);
+  EXPECT_EQ(a & u_b, 0);
+
+  EXPECT_GT(a | b, a);
+  EXPECT_GT(u_a | b, a);
+  EXPECT_GT(a | b, b);
+  EXPECT_GT(a | u_b, b);
+
+  EXPECT_GT(a ^ b, a);
+  EXPECT_GT(u_a ^ b, a);
+  EXPECT_GT(a ^ b, b);
+  EXPECT_GT(a ^ u_b, b);
+  EXPECT_EQ(a ^ b, a + b);
+
+  u64 c = 0;
+  EXPECT_EQ(~c, u64::MAX);
+}

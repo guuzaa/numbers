@@ -1164,3 +1164,28 @@ TEST(integerTest, ModuloArithmetic) {
   ++b;
   EXPECT_EQ(b % a, 1);
 }
+
+TEST(integerTest, BitOperations) {
+  int i_a = 1;
+  int i_b = 1 << 2;
+  i32 a = i_a;
+  i32 b = i_b;
+  EXPECT_EQ(a & b, 0);
+  EXPECT_EQ(i_a & b, 0);
+  EXPECT_EQ(a & b, 0);
+  EXPECT_EQ(a & i_b, 0);
+
+  EXPECT_GT(a | b, a);
+  EXPECT_GT(i_a | b, a);
+  EXPECT_GT(a | b, b);
+  EXPECT_GT(a | i_b, b);
+
+  EXPECT_GT(a ^ b, a);
+  EXPECT_GT(i_a ^ b, a);
+  EXPECT_GT(a ^ b, b);
+  EXPECT_GT(a ^ i_b, b);
+  EXPECT_EQ(a ^ b, a + b);
+
+  i32 c = 0;
+  EXPECT_EQ(~c, -1);
+}
