@@ -138,9 +138,7 @@ class Uinteger {
     return Uinteger(num_ * other.num_);
   }
 
-  constexpr Uinteger operator%(const Uinteger<T> &other) const {
-    return Uinteger(num_ % other.num_);
-  }
+  constexpr Uinteger operator%(const Uinteger<T> &other) const { return Uinteger(num_ % other.num_); }
 
   constexpr Uinteger operator-() const noexcept(false) {
     if (num_ == min_) {
@@ -285,10 +283,10 @@ class Uinteger {
   constexpr bool div_overflow(T a, T b) const noexcept { return false; }
 
   constexpr bool mul_overflow_helper(T a, T b) const {
-      if (a == 0 || b == 0) {
-        return false;
-      }
-      return (max_ / a) < b;
+    if (a == 0 || b == 0) {
+      return false;
+    }
+    return (max_ / a) < b;
   }
 
   constexpr bool mul_overflow(T a, T b) const {
@@ -377,7 +375,7 @@ constexpr bool operator==(U lhs, Uinteger<T> rhs) noexcept {
   return Uinteger<T>(lhs) == rhs;
 }
 
-template <typename U, typename T, typename = std::enable_if_t< std::is_convertible_v<U, T>>>
+template <typename U, typename T, typename = std::enable_if_t<std::is_convertible_v<U, T>>>
 constexpr bool operator>(U lhs, Uinteger<T> rhs) noexcept {
   return Uinteger<T>(lhs) > rhs;
 }
@@ -444,7 +442,9 @@ struct hash<numbers::u64> {
 // TODO hash collision
 template <>
 struct hash<numbers::u128> {
-  size_t operator()(const numbers::u128 &obj) const { return std::hash<numbers::uint128>()(static_cast<numbers::uint128>(obj)); }
+  size_t operator()(const numbers::u128 &obj) const {
+    return std::hash<numbers::uint128>()(static_cast<numbers::uint128>(obj));
+  }
 };
 
 }  // namespace std

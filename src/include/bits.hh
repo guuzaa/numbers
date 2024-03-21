@@ -3,8 +3,8 @@
 
 #include <type_traits>
 
-#include "internal/config.h"
 #include "internal/bits.hh"
+#include "internal/config.h"
 
 #if NUMBERS_INTERNAL_CPLUSPLUS_LANG >= 202002L
 #include <bit>

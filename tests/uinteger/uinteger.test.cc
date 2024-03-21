@@ -784,7 +784,7 @@ TEST(UintegerTest, Hash) {
 
 TEST(UintegerTest, UnorderedSet) {
   std::unordered_set<u8> s8;
-  size_t cnt  = 0;
+  size_t cnt = 0;
   for (u8 i = u8::MIN; i < u8::MAX; i = i.saturating_add(19)) {
     s8.insert(i);
     ++cnt;

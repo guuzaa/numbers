@@ -9,5 +9,4 @@
 #define NUMBERS_HAVE_BUILTIN(x) 0
 #endif  // __has_builtin
 
-
 #endif

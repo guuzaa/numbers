@@ -140,9 +140,7 @@ class Integer {
     return Integer(num_ * other.num_);
   }
 
-  constexpr Integer operator%(const Integer<T> &other) const {
-    return Integer(num_ % other.num_);
-  }
+  constexpr Integer operator%(const Integer<T> &other) const { return Integer(num_ % other.num_); }
 
   constexpr Integer abs() const noexcept(false) {
     if (num_ == min_) {
@@ -505,7 +503,9 @@ struct hash<numbers::i64> {
 // TODO hash collision
 template <>
 struct hash<numbers::i128> {
-  size_t operator()(const numbers::i128 &obj) const { return std::hash<numbers::int128>()(static_cast<numbers::int128>(obj)); }
+  size_t operator()(const numbers::i128 &obj) const {
+    return std::hash<numbers::int128>()(static_cast<numbers::int128>(obj));
+  }
 };
 
 }  // namespace std

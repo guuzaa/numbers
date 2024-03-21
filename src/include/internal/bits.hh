@@ -1,8 +1,8 @@
 #ifndef NUMBERS_INTERNAL_BITS_HH
 #define NUMBERS_INTERNAL_BITS_HH
 
-#include <type_traits>
 #include <limits>
+#include <type_traits>
 
 #if defined(_MSC_VER) && !defined(__clang__)
 #include <intrin.h>
@@ -39,11 +39,11 @@ inline int count_leading_zeroes32(uint32_t x) {
   if (x >> 8) {
     zeroes -= 8;
     x >>= 8;
-   }
+  }
   if (x >> 4) {
     zeroes -= 4;
     x >>= 4;
-   }
+  }
   return "\4\3\2\2\1\1\1\1\0\0\0\0\0\0\0"[x] + zeroes;
 #endif
 }
@@ -62,14 +62,14 @@ inline int count_leading_zeroes64(uint64_t x) {
   static_assert(sizeof(unsigned long long) == sizeof(x), "__builtin_clzll does not take 64-bit argument");
   return x == 0 ? 64 : __builtin_clzll(x);
 #elif defined(__MSC_VER) && !defined(__clang__) && (defined(_M_X64) || defined(_M_ARM64))
-// MSVC doesn't have __builtin_clzll. Use _BitScanReverse64
+  // MSVC doesn't have __builtin_clzll. Use _BitScanReverse64
   unsigned long result = 0;
   if (_BitScanReverse64(&result, x)) {
     return 63 - result;
   }
   return 64;
 #elif defined(__MSC_VER) && !defined(__clang__)
-// MSVC doesn't have __builtin_clzll. Compose two calls to _BitScanReverse
+  // MSVC doesn't have __builtin_clzll. Compose two calls to _BitScanReverse
   unsigned long result = 0;
   if ((x >> 32) && _BitScanReverse(&result, static_cast<unsigned long>(x >> 32))) {
     return 31 - result;
