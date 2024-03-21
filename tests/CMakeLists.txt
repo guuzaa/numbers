@@ -48,7 +48,7 @@ foreach(test_dir ${test_dir_list})
 endforeach()
 
 add_custom_target(tests)
-add_dependencies(tests test_utils ${TEST_TARGETS})
+add_dependencies(tests ${TEST_TARGETS})
 
 add_custom_target(run-tests
     COMMAND ${CMAKE_CTEST_COMMAND} -C Debug

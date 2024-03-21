@@ -17,7 +17,7 @@ jobs:
         include:
           - os: ubuntu-latest
             compiler: GCC
-            install: sudo apt-get update && sudo apt-get install -y build-essential ninja-build
+            install: sudo apt-get update && sudo apt-get install -y build-essential ninja-build clang-format-14
             build-dir: build-gcc
           - os: macos-latest
             compiler: Clang
@@ -44,6 +44,10 @@ jobs:
     - name: Test
       run: |
         cmake --build ${{ matrix.build-dir }} --target run-tests
+    - name: Check Format
+      if: runner.os == 'Linux'
+      run: |
+        cmake --build ${{ matrix.build-dir }} --target check-format
     - name: Example
       run: |
         cmake --build ${{ matrix.build-dir }} --target example

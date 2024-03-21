@@ -46,6 +46,46 @@ if(NUMBERS_TEST)
     add_subdirectory(third_party)
     add_subdirectory(tests)
 
+    set(BUILD_SUPPORT_DIR "${CMAKE_SOURCE_DIR}/build_support")
+    set(BUSTUB_CLANG_SEARCH_PATH "/usr/local/bin" "/usr/bin" "/usr/local/opt/llvm/bin" "/usr/local/opt/llvm@14/bin"
+        "/opt/homebrew/opt/llvm@14/bin/")
+
+    find_program(CLANG_FORMAT_BIN
+        NAMES clang-format clang-format-14
+        HINTS ${CLANG_SEARCH_PATH}
+    )
+
+    if("${CLANG_FORMAT_BIN}" STREQUAL "CLANG_FORMAT_BIN-NOTFOUND")
+        message(WARNING "numbers/main couldn't find clang-format.")
+    else()
+        message(STATUS "numbers/main found clang-format at ${CLANG_FORMAT_BIN}")
+    endif()
+
+    string(CONCAT FORMAT_DIRS
+        "${CMAKE_CURRENT_SOURCE_DIR}/src,"
+        "${CMAKE_CURRENT_SOURCE_DIR}/examples,"
+        "${CMAKE_CURRENT_SOURCE_DIR}/tests,"
+    )
+
+    # Runs clang format and updates files in place.
+    add_custom_target(format ${BUILD_SUPPORT_DIR}/run_clang_format.py
+        ${CLANG_FORMAT_BIN}
+        ${BUILD_SUPPORT_DIR}/clang_format_exclusions.txt
+        --source_dirs
+        ${FORMAT_DIRS}
+        --fix
+        --quiet
+    )
+
+    # Runs clang format and exits with a non-zero exit code if any files need to be reformatted
+    add_custom_target(check-format ${BUILD_SUPPORT_DIR}/run_clang_format.py
+        ${CLANG_FORMAT_BIN}
+        ${BUILD_SUPPORT_DIR}/clang_format_exclusions.txt
+        --source_dirs
+        ${FORMAT_DIRS}
+        --quiet
+    )
+
     # Provide only the minimum source files needed by downstream users
     set(package_files src/ CMakeLists.txt LICENSE.txt)
     set(packaged_zip ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-src.zip)
