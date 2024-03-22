@@ -21,7 +21,7 @@ jobs:
             build-dir: build-gcc
           - os: macos-latest
             compiler: Clang
-            install: "brew install ninja"
+            install: "brew install ninja clang-format"
             build-dir: build-clang
           - os: windows-latest
             compiler: MSVC
@@ -45,7 +45,7 @@ jobs:
       run: |
         cmake --build ${{ matrix.build-dir }} --target run-tests
     - name: Check Format
-      if: runner.os == 'Linux'
+      if: runner.os != 'Windows'
       run: |
         cmake --build ${{ matrix.build-dir }} --target check-format
     - name: Example
