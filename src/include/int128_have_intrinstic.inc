@@ -120,9 +120,15 @@ constexpr int128 operator-(int128 lhs, int128 rhs) { return static_cast<__int128
 
 inline int128 operator*(int128 lhs, int128 rhs) { return static_cast<__int128>(lhs) * static_cast<__int128>(rhs); }
 
-inline int128 operator/(int128 lhs, int128 rhs) { return static_cast<__int128>(lhs) / static_cast<__int128>(rhs); }
+inline int128 operator/(int128 lhs, int128 rhs) {
+  assert(rhs != 0);
+  return static_cast<__int128>(lhs) / static_cast<__int128>(rhs);
+}
 
-inline int128 operator%(int128 lhs, int128 rhs) { return static_cast<__int128>(lhs) % static_cast<__int128>(rhs); }
+inline int128 operator%(int128 lhs, int128 rhs) {
+  assert(rhs != 0);
+  return static_cast<__int128>(lhs) % static_cast<__int128>(rhs);
+}
 
 inline int128 int128::operator++(int) {
   int128 tmp(*this);

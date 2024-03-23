@@ -191,7 +191,7 @@ int128 operator%(int128 lhs, int128 rhs) {
   }
   return make_int128(int128_internal::BitCastToSigned(uint128_high64(remainder)), uint128_low64(remainder));
 }
-#endif  // NUMBERS_HAVE_INTRINSTIC_INT128
+#endif  // ! NUMBERS_HAVE_INTRINSTIC_INT128
 
 std::ostream &operator<<(std::ostream &os, int128 v) {
   std::ios_base::fmtflags flags = os.flags();
