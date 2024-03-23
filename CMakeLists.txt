@@ -47,7 +47,7 @@ if(NUMBERS_TEST)
     add_subdirectory(tests)
 
     set(BUILD_SUPPORT_DIR "${CMAKE_SOURCE_DIR}/build_support")
-    set(BUSTUB_CLANG_SEARCH_PATH "/usr/local/bin" "/usr/bin" "/usr/local/opt/llvm/bin" "/usr/local/opt/llvm@14/bin"
+    set(CLANG_SEARCH_PATH "/usr/local/bin" "/usr/bin" "/usr/local/opt/llvm/bin" "/usr/local/opt/llvm@14/bin"
         "/opt/homebrew/opt/llvm@14/bin/")
 
     find_program(CLANG_FORMAT_BIN

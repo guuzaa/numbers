@@ -27,7 +27,7 @@ import subprocess
 import sys
 
 
-def has_correct_extensions(filename, extensions=(".h", ".hh", ".cc")):
+def has_correct_extensions(filename, extensions=(".h", ".hh", ".cc", ".inc")):
     return filename.endswith(extensions)
 
 
