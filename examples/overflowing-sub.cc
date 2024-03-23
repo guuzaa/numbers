@@ -8,7 +8,7 @@ void for_error() {
 
   // error - infinite loop
   for (i = 10; i >= 0; i--) {
-    printf("[ID %u] Hello, World\n", i);
+    printf("[ID %lu] Hello, World\n", i);
   }
 }
 

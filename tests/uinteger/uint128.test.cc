@@ -79,9 +79,9 @@ class Uint128Test : public ::testing::Test {
 TEST_F(Uint128Test, __int128ConstructAssignTest) {
   static_assert(std::is_constructible<numbers::uint128, __int128>::value,
                 "numbers::uint128 must be constructible from __int128");
-  static_assert(!std::is_assignable<numbers::uint128&, __int128>::value,
+  static_assert(!std::is_assignable<numbers::uint128 &, __int128>::value,
                 "numbers::uint128 must be assignable from __int128 &");
-  static_assert(!std::is_assignable<__int128&, numbers::uint128>::value,
+  static_assert(!std::is_assignable<__int128 &, numbers::uint128>::value,
                 "__int128 must not be assignable from numbers::uint128");
 }
 #endif
@@ -398,7 +398,11 @@ TEST_F(Uint128Test, NumericLimits) {
   EXPECT_FALSE(std::numeric_limits<numbers::uint128>::is_iec559);
   EXPECT_TRUE(std::numeric_limits<numbers::uint128>::is_bounded);
   EXPECT_TRUE(std::numeric_limits<numbers::uint128>::is_modulo);
+#ifdef NUMBERS_HAVE_INTRINSTIC_INT128
+  EXPECT_EQ(std::numeric_limits<numbers::uint128>::traps, std::numeric_limits<unsigned __int128>::traps);
+#else
   EXPECT_EQ(std::numeric_limits<numbers::uint128>::traps, std::numeric_limits<uint64_t>::traps);
+#endif
   EXPECT_FALSE(std::numeric_limits<numbers::uint128>::tinyness_before);
   EXPECT_EQ(std::numeric_limits<numbers::uint128>::round_style, std::round_toward_zero);
 }

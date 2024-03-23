@@ -25,6 +25,11 @@
 
 #include "internal/config.h"
 
+#if defined(_MSC_VER) && defined(_M_X64) && !defined(_M_ARM64EC)
+#include <intrin.h>
+#pragma intrinsic(_umul128)
+#endif
+
 namespace numbers {
 class int128;
 class uint128 {
@@ -177,7 +182,11 @@ class numeric_limits<numbers::uint128> {
   static constexpr int min_exponent10 = 0;
   static constexpr int max_exponent = 0;
   static constexpr int max_exponent10 = 0;
+#ifdef NUMBERS_HAVE_INTRINSTIC_INT128
+  static constexpr bool traps = numeric_limits<unsigned __int128>::traps;
+#else
   static constexpr bool traps = numeric_limits<uint64_t>::traps;
+#endif
   static constexpr bool tinyness_before = false;
 
   static constexpr numbers::uint128(min)() { return 0; }
@@ -360,7 +369,11 @@ class numeric_limits<numbers::int128> {
   static constexpr int min_exponent10 = 0;
   static constexpr int max_exponent = 0;
   static constexpr int max_exponent10 = 0;
+#ifdef NUMBERS_HAVE_INTRINSTIC_INT128
+  static constexpr bool traps = numeric_limits<__int128>::traps;
+#else
   static constexpr bool traps = numeric_limits<uint64_t>::traps;
+#endif
   static constexpr bool tinyness_before = false;
 
   static constexpr numbers::int128(min)() { return numbers::int128_min(); }
@@ -522,14 +535,22 @@ inline uint128::operator long double() const {
 // comparison operators
 
 constexpr bool operator==(uint128 lhs, uint128 rhs) {
+#ifdef NUMBERS_HAVE_INTRINSTIC_INT128
+  return static_cast<unsigned __int128>(lhs) == static_cast<unsigned __int128>(rhs);
+#else
   return (uint128_low64(lhs) == uint128_low64(rhs)) && (uint128_high64(lhs) == uint128_high64(rhs));
+#endif
 }
 
 constexpr bool operator!=(uint128 lhs, uint128 rhs) { return !(lhs == rhs); }
 
 constexpr bool operator<(uint128 lhs, uint128 rhs) {
+#ifdef NUMBERS_HAVE_INTRINSTIC_INT128
+  return static_cast<unsigned __int128>(lhs) < static_cast<unsigned __int128>(rhs);
+#else
   return (uint128_high64(lhs) == uint128_high64(rhs)) ? (uint128_low64(lhs) < uint128_low64(rhs))
                                                       : (uint128_high64(lhs) < uint128_high64(rhs));
+#endif
 }
 
 constexpr bool operator>(uint128 lhs, uint128 rhs) { return rhs < lhs; }
@@ -545,24 +566,52 @@ constexpr inline uint128 operator+(uint128 val) { return val; }
 constexpr inline int128 operator+(int128 val) { return val; }
 
 constexpr inline uint128 operator-(uint128 val) {
+#ifdef NUMBERS_HAVE_INTRINSTIC_INT128
+  return -static_cast<unsigned __int128>(val);
+#else
   // The high 64 bits are the bitwise NOT of the high 64 bits of val plus 1 if the low 64 bits are zero
   return make_uint128(~uint128_high64(val) + static_cast<uint64_t>(uint128_low64(val) == 0), ~uint128_low64(val) + 1);
+#endif
 }
 
-constexpr inline uint128 operator!(uint128 val) { return !uint128_high64(val) && !uint128_low64(val); }
+constexpr inline uint128 operator!(uint128 val) {
+#ifdef NUMBERS_HAVE_INTRINSTIC_INT128
+  return !static_cast<unsigned __int128>(val);
+#else
+  return !uint128_high64(val) && !uint128_low64(val);
+#endif
+}
 
-constexpr inline uint128 operator~(uint128 val) { return make_uint128(~uint128_high64(val), ~uint128_low64(val)); }
+constexpr inline uint128 operator~(uint128 val) {
+#ifdef NUMBERS_HAVE_INTRINSTIC_INT128
+  return ~static_cast<unsigned __int128>(val);
+#else
+  return make_uint128(~uint128_high64(val), ~uint128_low64(val));
+#endif
+}
 
 constexpr inline uint128 operator|(uint128 lhs, uint128 rhs) {
+#ifdef NUMBERS_HAVE_INTRINSTIC_INT128
+  return static_cast<unsigned __int128>(lhs) | static_cast<unsigned __int128>(rhs);
+#else
   return make_uint128(uint128_high64(lhs) | uint128_high64(rhs), uint128_low64(lhs) | uint128_low64(rhs));
+#endif
 }
 
 constexpr inline uint128 operator&(uint128 lhs, uint128 rhs) {
+#ifdef NUMBERS_HAVE_INTRINSTIC_INT128
+  return static_cast<unsigned __int128>(lhs) & static_cast<unsigned __int128>(rhs);
+#else
   return make_uint128(uint128_high64(lhs) & uint128_high64(rhs), uint128_low64(lhs) & uint128_low64(rhs));
+#endif
 }
 
 constexpr inline uint128 operator^(uint128 lhs, uint128 rhs) {
+#ifdef NUMBERS_HAVE_INTRINSTIC_INT128
+  return static_cast<unsigned __int128>(lhs) ^ static_cast<unsigned __int128>(rhs);
+#else
   return make_uint128(uint128_high64(lhs) ^ uint128_high64(rhs), uint128_low64(lhs) ^ uint128_low64(rhs));
+#endif
 }
 
 inline uint128 &uint128::operator|=(uint128 other) {
@@ -581,19 +630,28 @@ inline uint128 &uint128::operator^=(uint128 other) {
 }
 
 constexpr uint128 operator<<(uint128 lhs, int amount) {
+#ifdef NUMBERS_HAVE_INTRINSTIC_INT128
+  return static_cast<unsigned __int128>(lhs) << amount;
+#else
   return amount >= 64  ? make_uint128(uint128_low64(lhs) << (amount - 64), 0)
          : amount == 0 ? lhs
                        : make_uint128((uint128_high64(lhs) << amount) | (uint128_low64(lhs) >> (64 - amount)),
                                       uint128_low64(lhs) << amount);
+#endif
 }
 
 constexpr uint128 operator>>(uint128 lhs, int amount) {
+#ifdef NUMBERS_HAVE_INTRINSTIC_INT128
+  return static_cast<unsigned __int128>(lhs) >> amount;
+#else
   return amount >= 64  ? make_uint128(0, uint128_high64(lhs) >> (amount - 64))
          : amount == 0 ? lhs
                        : make_uint128(uint128_high64(lhs) >> amount,
                                       (uint128_low64(lhs) >> amount) | (uint128_high64(lhs) << (64 - amount)));
+#endif
 }
 
+#ifndef NUMBERS_HAVE_INTRINSTIC_INT128
 namespace int128_internal {
 // Returns the result of adding two uint128 values, with overflow detected.
 constexpr uint128 AddResult(uint128 result, uint128 lhs) {
@@ -601,26 +659,44 @@ constexpr uint128 AddResult(uint128 result, uint128 lhs) {
                                                       : result;
 }
 }  // namespace int128_internal
+#endif
 
 constexpr uint128 operator+(uint128 lhs, uint128 rhs) {
+#ifdef NUMBERS_HAVE_INTRINSTIC_INT128
+  return static_cast<unsigned __int128>(lhs) + static_cast<unsigned __int128>(rhs);
+#else
   return int128_internal::AddResult(
       make_uint128(uint128_high64(lhs) + uint128_high64(rhs), uint128_low64(lhs) + uint128_low64(rhs)), lhs);
+#endif
 }
 
+#ifndef NUMBERS_HAVE_INTRINSTIC_INT128
 namespace int128_internal {
 constexpr uint128 SubtractResult(uint128 result, uint128 lhs, uint128 rhs) {
   return (uint128_low64(lhs) < uint128_low64(rhs)) ? make_uint128(uint128_high64(result) - 1, uint128_low64(result))
                                                    : result;
 }
 }  // namespace int128_internal
+#endif
 
 constexpr uint128 operator-(uint128 lhs, uint128 rhs) {
+#ifdef NUMBERS_HAVE_INTRINSTIC_INT128
+  return static_cast<unsigned __int128>(lhs) - static_cast<unsigned __int128>(rhs);
+#else
   return int128_internal::SubtractResult(
       make_uint128(uint128_high64(lhs) - uint128_high64(rhs), uint128_low64(lhs) - uint128_low64(rhs)), lhs, rhs);
+#endif
 }
 
 // Ref https://en.wikipedia.org/wiki/Karatsuba_algorithm
 inline uint128 operator*(uint128 lhs, uint128 rhs) {
+#ifdef NUMBERS_HAVE_INTRINSTIC_INT128
+  return static_cast<unsigned __int128>(lhs) * static_cast<unsigned __int128>(rhs);
+#elif defined(_MSC_VER) && defined(_M_X64) && !defined(_M_ARM64EC)
+  uint64_t carry;
+  uint64_t low = _umu128(uint128_low64(lhs), uint128_low64(rhs), &carry);
+  return make_uint128(uint128_low64(lhs) * uint128_high64(rhs) + uint128_high64(lhs) * uint128_low64(rhs) + carry, low);
+#else
   uint64_t a32 = uint128_low64(lhs) >> 32;
   uint64_t a00 = uint128_low64(lhs) & 0xffffffff;
   uint64_t b32 = uint128_low64(rhs) >> 32;
@@ -630,6 +706,7 @@ inline uint128 operator*(uint128 lhs, uint128 rhs) {
   result += uint128(a32 * b00) << 32;
   result += uint128(a00 * b32) << 32;
   return result;
+#endif
 }
 
 // TODO implement division and modulo
