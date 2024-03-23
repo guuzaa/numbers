@@ -23,6 +23,8 @@
 #include <limits>
 #include <string>
 
+#include "internal/config.h"
+
 namespace numbers {
 class int128;
 class uint128 {
@@ -36,6 +38,11 @@ class uint128 {
   constexpr uint128(long long v);
   constexpr uint128(unsigned long long v);
   constexpr uint128(int128 v);
+
+#ifdef NUMBERS_HAVE_INTRINSTIC_INT128
+  constexpr uint128(__int128 v);
+  constexpr uint128(unsigned __int128 v);
+#endif
 
   explicit uint128(float v);
   explicit uint128(double v);
@@ -65,6 +72,11 @@ class uint128 {
   constexpr explicit operator unsigned long() const;
   constexpr explicit operator long long() const;
   constexpr explicit operator unsigned long long() const;
+
+#ifdef NUMBERS_HAVE_INTRINSTIC_INT128
+  constexpr explicit operator __int128() const;
+  constexpr explicit operator unsigned __int128() const;
+#endif
 
   explicit operator float() const;
   explicit operator double() const;
@@ -452,6 +464,15 @@ constexpr uint128::uint128(unsigned long long v) : lo_{v}, hi_{0} {}
 
 constexpr uint128::uint128(int128 v) : lo_{int128_low64(v)}, hi_{static_cast<uint64_t>(int128_high64(v))} {}
 
+#ifdef NUMBERS_HAVE_INTRINSTIC_INT128
+constexpr uint128::uint128(__int128 v)
+    : lo_{static_cast<uint64_t>(v & ~uint64_t{0})},
+      hi_{static_cast<uint64_t>(static_cast<unsigned __int128>(v) >> 64)} {}
+
+constexpr uint128::uint128(unsigned __int128 v)
+    : lo_{static_cast<uint64_t>(v & ~uint64_t{0})}, hi_{static_cast<uint64_t>(v >> 64)} {}
+#endif
+
 // Conversion operators to integer types.
 
 constexpr uint128::operator bool() const { return lo_ || hi_; }
@@ -481,6 +502,12 @@ constexpr uint128::operator unsigned long() const { return static_cast<unsigned 
 constexpr uint128::operator long long() const { return static_cast<long long>(lo_); }
 
 constexpr uint128::operator unsigned long long() const { return static_cast<unsigned long long>(lo_); }
+
+#ifdef NUMBERS_HAVE_INTRINSTIC_INT128
+constexpr uint128::operator __int128() const { return (static_cast<__int128>(hi_) << 64) + lo_; }
+
+constexpr uint128::operator unsigned __int128() const { return (static_cast<unsigned __int128>(hi_) << 64) + lo_; }
+#endif
 
 // Conversion operators to floating point types.
 

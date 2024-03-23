@@ -75,6 +75,17 @@ class Uint128Test : public ::testing::Test {
   void TearDown() override {}
 };
 
+#ifdef NUMBERS_HAVE_INTRINSTIC_INT128
+TEST_F(Uint128Test, __int128ConstructAssignTest) {
+  static_assert(std::is_constructible<numbers::uint128, __int128>::value,
+                "numbers::uint128 must be constructible from __int128");
+  static_assert(!std::is_assignable<numbers::uint128&, __int128>::value,
+                "numbers::uint128 must be assignable from __int128 &");
+  static_assert(!std::is_assignable<__int128&, numbers::uint128>::value,
+                "__int128 must not be assignable from numbers::uint128");
+}
+#endif
+
 TEST_F(Uint128Test, TrivialTraitsTest) {
   static_assert(std::is_trivially_constructible<numbers::uint128>::value,
                 "numbers::uint128 must be trivially constructible");
