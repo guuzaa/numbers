@@ -23,6 +23,13 @@
 #include <limits>
 #include <string>
 
+#include "internal/config.h"
+
+#if defined(_MSC_VER) && defined(_M_X64) && !defined(_M_ARM64EC)
+#include <intrin.h>
+#pragma intrinsic(_umul128)
+#endif
+
 namespace numbers {
 class int128;
 class uint128 {
@@ -36,6 +43,11 @@ class uint128 {
   constexpr uint128(long long v);
   constexpr uint128(unsigned long long v);
   constexpr uint128(int128 v);
+
+#ifdef NUMBERS_HAVE_INTRINSTIC_INT128
+  constexpr uint128(__int128 v);
+  constexpr uint128(unsigned __int128 v);
+#endif
 
   explicit uint128(float v);
   explicit uint128(double v);
@@ -65,6 +77,11 @@ class uint128 {
   constexpr explicit operator unsigned long() const;
   constexpr explicit operator long long() const;
   constexpr explicit operator unsigned long long() const;
+
+#ifdef NUMBERS_HAVE_INTRINSTIC_INT128
+  constexpr explicit operator __int128() const;
+  constexpr explicit operator unsigned __int128() const;
+#endif
 
   explicit operator float() const;
   explicit operator double() const;
@@ -165,7 +182,11 @@ class numeric_limits<numbers::uint128> {
   static constexpr int min_exponent10 = 0;
   static constexpr int max_exponent = 0;
   static constexpr int max_exponent10 = 0;
+#ifdef NUMBERS_HAVE_INTRINSTIC_INT128
+  static constexpr bool traps = numeric_limits<unsigned __int128>::traps;
+#else
   static constexpr bool traps = numeric_limits<uint64_t>::traps;
+#endif
   static constexpr bool tinyness_before = false;
 
   static constexpr numbers::uint128(min)() { return 0; }
@@ -194,6 +215,10 @@ class int128 {
   constexpr int128(long long v);
   constexpr int128(unsigned long long v);
   constexpr explicit int128(uint128 v);
+#ifdef NUMBERS_HAVE_INTRINSTIC_INT128
+  constexpr int128(__int128 v);
+  constexpr explicit int128(unsigned __int128 v);
+#endif
 
   explicit int128(float v);
   explicit int128(double v);
@@ -206,6 +231,9 @@ class int128 {
   int128 &operator=(unsigned long v);
   int128 &operator=(long long v);
   int128 &operator=(unsigned long long v);
+#ifdef NUMBERS_HAVE_INTRINSTIC_INT128
+  int128 &operator=(__int128 v);
+#endif
 
   // Conversion operators to other arithmetic types
   constexpr explicit operator bool() const;
@@ -226,6 +254,10 @@ class int128 {
   constexpr explicit operator long long() const;
 
   constexpr explicit operator unsigned long long() const;
+#ifdef NUMBERS_HAVE_INTRINSTIC_INT128
+  constexpr explicit operator __int128() const;
+  constexpr explicit operator unsigned __int128() const;
+#endif
 
   // TODO unimplemented!
   explicit operator float() const;
@@ -294,9 +326,13 @@ class int128 {
 
   std::string to_string() const;
 
+#ifdef NUMBERS_HAVE_INTRINSTIC_INT128
+  __int128 v_;
+#else
   // little endian
   uint64_t lo_;
   int64_t hi_;
+#endif
 };
 
 std::ostream &operator<<(std::ostream &os, int128 v);
@@ -348,7 +384,11 @@ class numeric_limits<numbers::int128> {
   static constexpr int min_exponent10 = 0;
   static constexpr int max_exponent = 0;
   static constexpr int max_exponent10 = 0;
+#ifdef NUMBERS_HAVE_INTRINSTIC_INT128
+  static constexpr bool traps = numeric_limits<__int128>::traps;
+#else
   static constexpr bool traps = numeric_limits<uint64_t>::traps;
+#endif
   static constexpr bool tinyness_before = false;
 
   static constexpr numbers::int128(min)() { return numbers::int128_min(); }
@@ -452,6 +492,15 @@ constexpr uint128::uint128(unsigned long long v) : lo_{v}, hi_{0} {}
 
 constexpr uint128::uint128(int128 v) : lo_{int128_low64(v)}, hi_{static_cast<uint64_t>(int128_high64(v))} {}
 
+#ifdef NUMBERS_HAVE_INTRINSTIC_INT128
+constexpr uint128::uint128(__int128 v)
+    : lo_{static_cast<uint64_t>(v & ~uint64_t{0})},
+      hi_{static_cast<uint64_t>(static_cast<unsigned __int128>(v) >> 64)} {}
+
+constexpr uint128::uint128(unsigned __int128 v)
+    : lo_{static_cast<uint64_t>(v & ~uint64_t{0})}, hi_{static_cast<uint64_t>(v >> 64)} {}
+#endif
+
 // Conversion operators to integer types.
 
 constexpr uint128::operator bool() const { return lo_ || hi_; }
@@ -482,6 +531,12 @@ constexpr uint128::operator long long() const { return static_cast<long long>(lo
 
 constexpr uint128::operator unsigned long long() const { return static_cast<unsigned long long>(lo_); }
 
+#ifdef NUMBERS_HAVE_INTRINSTIC_INT128
+constexpr uint128::operator __int128() const { return (static_cast<__int128>(hi_) << 64) + lo_; }
+
+constexpr uint128::operator unsigned __int128() const { return (static_cast<unsigned __int128>(hi_) << 64) + lo_; }
+#endif
+
 // Conversion operators to floating point types.
 
 inline uint128::operator float() const { return static_cast<float>(lo_) + std::ldexp(static_cast<float>(hi_), 64); }
@@ -495,14 +550,22 @@ inline uint128::operator long double() const {
 // comparison operators
 
 constexpr bool operator==(uint128 lhs, uint128 rhs) {
+#ifdef NUMBERS_HAVE_INTRINSTIC_INT128
+  return static_cast<unsigned __int128>(lhs) == static_cast<unsigned __int128>(rhs);
+#else
   return (uint128_low64(lhs) == uint128_low64(rhs)) && (uint128_high64(lhs) == uint128_high64(rhs));
+#endif
 }
 
 constexpr bool operator!=(uint128 lhs, uint128 rhs) { return !(lhs == rhs); }
 
 constexpr bool operator<(uint128 lhs, uint128 rhs) {
+#ifdef NUMBERS_HAVE_INTRINSTIC_INT128
+  return static_cast<unsigned __int128>(lhs) < static_cast<unsigned __int128>(rhs);
+#else
   return (uint128_high64(lhs) == uint128_high64(rhs)) ? (uint128_low64(lhs) < uint128_low64(rhs))
                                                       : (uint128_high64(lhs) < uint128_high64(rhs));
+#endif
 }
 
 constexpr bool operator>(uint128 lhs, uint128 rhs) { return rhs < lhs; }
@@ -518,24 +581,52 @@ constexpr inline uint128 operator+(uint128 val) { return val; }
 constexpr inline int128 operator+(int128 val) { return val; }
 
 constexpr inline uint128 operator-(uint128 val) {
+#ifdef NUMBERS_HAVE_INTRINSTIC_INT128
+  return -static_cast<unsigned __int128>(val);
+#else
   // The high 64 bits are the bitwise NOT of the high 64 bits of val plus 1 if the low 64 bits are zero
   return make_uint128(~uint128_high64(val) + static_cast<uint64_t>(uint128_low64(val) == 0), ~uint128_low64(val) + 1);
+#endif
 }
 
-constexpr inline uint128 operator!(uint128 val) { return !uint128_high64(val) && !uint128_low64(val); }
+constexpr inline uint128 operator!(uint128 val) {
+#ifdef NUMBERS_HAVE_INTRINSTIC_INT128
+  return !static_cast<unsigned __int128>(val);
+#else
+  return !uint128_high64(val) && !uint128_low64(val);
+#endif
+}
 
-constexpr inline uint128 operator~(uint128 val) { return make_uint128(~uint128_high64(val), ~uint128_low64(val)); }
+constexpr inline uint128 operator~(uint128 val) {
+#ifdef NUMBERS_HAVE_INTRINSTIC_INT128
+  return ~static_cast<unsigned __int128>(val);
+#else
+  return make_uint128(~uint128_high64(val), ~uint128_low64(val));
+#endif
+}
 
 constexpr inline uint128 operator|(uint128 lhs, uint128 rhs) {
+#ifdef NUMBERS_HAVE_INTRINSTIC_INT128
+  return static_cast<unsigned __int128>(lhs) | static_cast<unsigned __int128>(rhs);
+#else
   return make_uint128(uint128_high64(lhs) | uint128_high64(rhs), uint128_low64(lhs) | uint128_low64(rhs));
+#endif
 }
 
 constexpr inline uint128 operator&(uint128 lhs, uint128 rhs) {
+#ifdef NUMBERS_HAVE_INTRINSTIC_INT128
+  return static_cast<unsigned __int128>(lhs) & static_cast<unsigned __int128>(rhs);
+#else
   return make_uint128(uint128_high64(lhs) & uint128_high64(rhs), uint128_low64(lhs) & uint128_low64(rhs));
+#endif
 }
 
 constexpr inline uint128 operator^(uint128 lhs, uint128 rhs) {
+#ifdef NUMBERS_HAVE_INTRINSTIC_INT128
+  return static_cast<unsigned __int128>(lhs) ^ static_cast<unsigned __int128>(rhs);
+#else
   return make_uint128(uint128_high64(lhs) ^ uint128_high64(rhs), uint128_low64(lhs) ^ uint128_low64(rhs));
+#endif
 }
 
 inline uint128 &uint128::operator|=(uint128 other) {
@@ -554,19 +645,28 @@ inline uint128 &uint128::operator^=(uint128 other) {
 }
 
 constexpr uint128 operator<<(uint128 lhs, int amount) {
+#ifdef NUMBERS_HAVE_INTRINSTIC_INT128
+  return static_cast<unsigned __int128>(lhs) << amount;
+#else
   return amount >= 64  ? make_uint128(uint128_low64(lhs) << (amount - 64), 0)
          : amount == 0 ? lhs
                        : make_uint128((uint128_high64(lhs) << amount) | (uint128_low64(lhs) >> (64 - amount)),
                                       uint128_low64(lhs) << amount);
+#endif
 }
 
 constexpr uint128 operator>>(uint128 lhs, int amount) {
+#ifdef NUMBERS_HAVE_INTRINSTIC_INT128
+  return static_cast<unsigned __int128>(lhs) >> amount;
+#else
   return amount >= 64  ? make_uint128(0, uint128_high64(lhs) >> (amount - 64))
          : amount == 0 ? lhs
                        : make_uint128(uint128_high64(lhs) >> amount,
                                       (uint128_low64(lhs) >> amount) | (uint128_high64(lhs) << (64 - amount)));
+#endif
 }
 
+#ifndef NUMBERS_HAVE_INTRINSTIC_INT128
 namespace int128_internal {
 // Returns the result of adding two uint128 values, with overflow detected.
 constexpr uint128 AddResult(uint128 result, uint128 lhs) {
@@ -574,26 +674,44 @@ constexpr uint128 AddResult(uint128 result, uint128 lhs) {
                                                       : result;
 }
 }  // namespace int128_internal
+#endif
 
 constexpr uint128 operator+(uint128 lhs, uint128 rhs) {
+#ifdef NUMBERS_HAVE_INTRINSTIC_INT128
+  return static_cast<unsigned __int128>(lhs) + static_cast<unsigned __int128>(rhs);
+#else
   return int128_internal::AddResult(
       make_uint128(uint128_high64(lhs) + uint128_high64(rhs), uint128_low64(lhs) + uint128_low64(rhs)), lhs);
+#endif
 }
 
+#ifndef NUMBERS_HAVE_INTRINSTIC_INT128
 namespace int128_internal {
 constexpr uint128 SubtractResult(uint128 result, uint128 lhs, uint128 rhs) {
   return (uint128_low64(lhs) < uint128_low64(rhs)) ? make_uint128(uint128_high64(result) - 1, uint128_low64(result))
                                                    : result;
 }
 }  // namespace int128_internal
+#endif
 
 constexpr uint128 operator-(uint128 lhs, uint128 rhs) {
+#ifdef NUMBERS_HAVE_INTRINSTIC_INT128
+  return static_cast<unsigned __int128>(lhs) - static_cast<unsigned __int128>(rhs);
+#else
   return int128_internal::SubtractResult(
       make_uint128(uint128_high64(lhs) - uint128_high64(rhs), uint128_low64(lhs) - uint128_low64(rhs)), lhs, rhs);
+#endif
 }
 
 // Ref https://en.wikipedia.org/wiki/Karatsuba_algorithm
 inline uint128 operator*(uint128 lhs, uint128 rhs) {
+#ifdef NUMBERS_HAVE_INTRINSTIC_INT128
+  return static_cast<unsigned __int128>(lhs) * static_cast<unsigned __int128>(rhs);
+#elif defined(_MSC_VER) && defined(_M_X64) && !defined(_M_ARM64EC)
+  uint64_t carry;
+  uint64_t low = _umul128(uint128_low64(lhs), uint128_low64(rhs), &carry);
+  return make_uint128(uint128_low64(lhs) * uint128_high64(rhs) + uint128_high64(lhs) * uint128_low64(rhs) + carry, low);
+#else
   uint64_t a32 = uint128_low64(lhs) >> 32;
   uint64_t a00 = uint128_low64(lhs) & 0xffffffff;
   uint64_t b32 = uint128_low64(rhs) >> 32;
@@ -603,6 +721,7 @@ inline uint128 operator*(uint128 lhs, uint128 rhs) {
   result += uint128(a32 * b00) << 32;
   result += uint128(a00 * b32) << 32;
   return result;
+#endif
 }
 
 // TODO implement division and modulo
@@ -718,189 +837,11 @@ constexpr int64_t BitCastToSigned(uint64_t v) {
 }
 }  // namespace int128_internal
 
-constexpr uint64_t int128_low64(int128 v) { return v.lo_; }
-
-constexpr int64_t int128_high64(int128 v) { return v.hi_; }
-
-constexpr int128::int128(int64_t high, uint64_t low) : lo_{low}, hi_{high} {}
-
-constexpr int128::int128(int v) : lo_{static_cast<uint64_t>(v)}, hi_{v < 0 ? ~int64_t{0} : 0} {}
-
-constexpr int128::int128(long v) : lo_{static_cast<uint64_t>(v)}, hi_{v < 0 ? ~int64_t{0} : 0} {}
-
-constexpr int128::int128(long long v) : lo_{static_cast<uint64_t>(v)}, hi_{v < 0 ? ~int64_t{0} : 0} {}
-
-constexpr int128::int128(unsigned int v) : lo_{v}, hi_{0} {}
-
-constexpr int128::int128(unsigned long v) : lo_{v}, hi_{0} {}
-
-constexpr int128::int128(unsigned long long v) : lo_{v}, hi_{0} {}
-
-constexpr int128::int128(uint128 v) : lo_{uint128_low64(v)}, hi_{static_cast<int64_t>(uint128_high64(v))} {}
-
-constexpr int128::operator bool() const { return lo_ || hi_; }
-
-constexpr int128::operator char() const { return static_cast<char>(static_cast<long long>(*this)); }
-
-constexpr int128::operator signed char() const { return static_cast<signed char>(static_cast<long long>(*this)); }
-
-constexpr int128::operator unsigned char() const { return static_cast<unsigned char>(lo_); }
-
-constexpr int128::operator char16_t() const { return static_cast<char16_t>(lo_); }
-
-constexpr int128::operator char32_t() const { return static_cast<char32_t>(lo_); }
-
-constexpr int128::operator short() const { return static_cast<short>(static_cast<long long>(*this)); }
-
-constexpr int128::operator unsigned short() const { return static_cast<unsigned short>(lo_); }
-
-constexpr int128::operator int() const { return static_cast<int>(static_cast<long long>(*this)); }
-
-constexpr int128::operator unsigned int() const { return static_cast<unsigned int>(lo_); }
-
-constexpr int128::operator long() const { return static_cast<long>(static_cast<long long>(*this)); }
-
-constexpr int128::operator unsigned long() const { return static_cast<unsigned long>(lo_); }
-
-constexpr int128::operator long long() const { return int128_internal::BitCastToSigned(lo_); }
-
-constexpr int128::operator unsigned long long() const { return static_cast<unsigned long long>(lo_); }
-
-// Comparison operators
-constexpr bool operator==(int128 lhs, int128 rhs) {
-  return (int128_low64(lhs) == int128_low64(rhs) && int128_high64(lhs) == int128_high64(rhs));
-}
-
-constexpr bool operator!=(int128 lhs, int128 rhs) { return !(lhs == rhs); }
-
-constexpr bool operator<(int128 lhs, int128 rhs) {
-  return (int128_high64(lhs) == int128_high64(rhs)) ? (int128_low64(lhs) < int128_low64(rhs))
-                                                    : (int128_high64(lhs) < int128_high64(rhs));
-}
-
-constexpr bool operator>(int128 lhs, int128 rhs) {
-  return (int128_high64(lhs) == int128_high64(rhs)) ? (int128_low64(lhs) > int128_low64(rhs))
-                                                    : (int128_high64(lhs) > int128_high64(rhs));
-}
-
-constexpr bool operator<=(int128 lhs, int128 rhs) { return !(lhs > rhs); }
-
-constexpr bool operator>=(int128 lhs, int128 rhs) { return !(lhs < rhs); }
-
-// Unary operators
-constexpr int128 operator-(int128 v) {
-  return make_int128(~int128_high64(v) + (int128_low64(v) == 0), ~int128_low64(v) + 1);
-}
-
-constexpr int128 operator!(int128 v) { return !int128_high64(v) && !int128_low64(v); }
-
-constexpr int128 operator~(int128 v) { return make_int128(~int128_high64(v), ~int128_low64(v)); }
-
-// Arithmetic operators
-namespace int128_internal {
-constexpr int128 SignedAddResult(int128 result, int128 lhs) {
-  // check for carry
-  return (int128_low64(result) < int128_low64(lhs)) ? make_int128(int128_high64(result) + 1, int128_low64(result))
-                                                    : result;
-}
-}  // namespace int128_internal
-
-constexpr int128 operator+(int128 lhs, int128 rhs) {
-  return int128_internal::SignedAddResult(
-      make_int128(int128_high64(lhs) + int128_high64(rhs), int128_low64(lhs) + int128_low64(rhs)), lhs);
-}
-
-namespace int128_internal {
-constexpr int128 SignedSubstructResult(int128 result, int128 lhs, int128 rhs) {
-  // check for carry
-  return (int128_low64(lhs) < int128_low64(rhs)) ? make_int128(int128_high64(result) - 1, int128_low64(result))
-                                                 : result;
-}
-}  // namespace int128_internal
-
-constexpr int128 operator-(int128 lhs, int128 rhs) {
-  return int128_internal::SignedSubstructResult(
-      make_int128(int128_high64(lhs) - int128_high64(rhs), int128_low64(lhs) - int128_low64(rhs)), lhs, rhs);
-}
-
-inline int128 operator*(int128 lhs, int128 rhs) {
-  return make_int128(int128_internal::BitCastToSigned(uint128_high64(uint128(lhs) * uint128(rhs))),
-                     uint128_low64(uint128(lhs) * uint128(rhs)));
-}
-
-inline int128 int128::operator++(int) {
-  int128 tmp(*this);
-  *this += 1;
-  return tmp;
-}
-
-inline int128 int128::operator--(int) {
-  int128 tmp(*this);
-  *this -= 1;
-  return tmp;
-}
-
-inline int128 &int128::operator++() {
-  *this += 1;
-  return *this;
-}
-
-inline int128 &int128::operator--() {
-  *this -= 1;
-  return *this;
-}
-
-constexpr int128 operator|(int128 lhs, int128 rhs) {
-  return make_int128(int128_high64(lhs) | int128_high64(rhs), int128_low64(lhs) | int128_low64(rhs));
-}
-
-constexpr int128 operator&(int128 lhs, int128 rhs) {
-  return make_int128(int128_high64(lhs) & int128_high64(rhs), int128_low64(lhs) & int128_low64(rhs));
-}
-
-constexpr int128 operator^(int128 lhs, int128 rhs) {
-  return make_int128(int128_high64(lhs) ^ int128_high64(rhs), int128_low64(lhs) ^ int128_low64(rhs));
-}
-
-constexpr int128 operator<<(int128 lhs, int amount) {
-  // int64_t shifts of >= 63 are undefined, so we need some special-casing.
-  assert(amount >= 0 && amount < 127);
-
-  if (amount <= 0) {
-    return lhs;
-  } else if (amount < 63) {
-    return make_int128((int128_high64(lhs) << amount) | static_cast<int64_t>(int128_low64(lhs) >> (64 - amount)),
-                       int128_low64(lhs) << amount);
-  } else if (amount == 63) {
-    return make_int128(((int128_high64(lhs) << 32) << 31) | static_cast<int64_t>(int128_low64(lhs) >> 1),
-                       (int128_low64(lhs) << 32) << 31);
-  } else if (amount == 127) {
-    return make_int128(static_cast<int64_t>(int128_low64(lhs) << 63), 0);
-  } else if (amount > 127) {
-    return make_int128(0, 0);
-  } else {  // amount >= 64 && amount < 127
-    return make_int128(static_cast<int64_t>(int128_low64(lhs) << (amount - 64)), 0);
-  }
-}
-
-constexpr int128 operator>>(int128 lhs, int amount) {
-  // int64_t shifts of >= 63 are undefined, so we need some special-casing.
-  assert(amount >= 0 && amount < 127);
-
-  if (amount <= 0) {
-    return lhs;
-  } else if (amount < 63) {
-    return make_int128(int128_high64(lhs) >> amount,
-                       int128_low64(lhs) >> amount | static_cast<uint64_t>(int128_high64(lhs)) << (64 - amount));
-  } else if (amount == 63) {
-    return make_int128((int128_high64(lhs) >> 32) >> 31,
-                       static_cast<uint64_t>(int128_high64(lhs) << 1) | (int128_low64(lhs) >> 32) >> 31);
-  } else if (amount >= 127) {
-    return make_int128((int128_high64(lhs) >> 32) >> 31, static_cast<uint64_t>((int128_high64(lhs) >> 32) >> 31));
-  } else {  // amount >= 64 && amount < 127
-    return make_int128((int128_high64(lhs) >> 32) >> 31, static_cast<uint64_t>(int128_high64(lhs) >> (amount - 64)));
-  }
-}
+#ifdef NUMBERS_HAVE_INTRINSTIC_INT128
+#include "int128_have_intrinstic.inc"
+#else
+#include "int128_no_intrinstic.inc"
+#endif
 
 }  // namespace numbers
 

@@ -784,11 +784,49 @@ TEST(UintegerTest, Hash) {
 
 TEST(UintegerTest, UnorderedSet) {
   std::unordered_set<u8> s8;
-  size_t cnt  = 0;
+  size_t cnt = 0;
   for (u8 i = u8::MIN; i < u8::MAX; i = i.saturating_add(19)) {
     s8.insert(i);
     ++cnt;
     ASSERT_EQ(s8.size(), cnt);
     ASSERT_EQ(s8.count(i), 1);
   }
+}
+
+TEST(UintegerTest, ModuloArithmetic) {
+  unsigned int i_a = 5678;
+  u64 a = i_a;
+  u64 b = a * 2;
+
+  EXPECT_EQ(i_a % b, a);
+  EXPECT_EQ(a % b, a);
+  EXPECT_EQ(b % a, 0);
+  EXPECT_EQ(b % i_a, 0);
+  ++b;
+  EXPECT_EQ(b % a, 1);
+}
+
+TEST(UintegerTest, BitOperations) {
+  u64 u_a = 1;
+  u64 u_b = 1 << 2;
+  u64 a = u_a;
+  u64 b = u_b;
+  EXPECT_EQ(a & b, 0);
+  EXPECT_EQ(u_a & b, 0);
+  EXPECT_EQ(a & b, 0);
+  EXPECT_EQ(a & u_b, 0);
+
+  EXPECT_GT(a | b, a);
+  EXPECT_GT(u_a | b, a);
+  EXPECT_GT(a | b, b);
+  EXPECT_GT(a | u_b, b);
+
+  EXPECT_GT(a ^ b, a);
+  EXPECT_GT(u_a ^ b, a);
+  EXPECT_GT(a ^ b, b);
+  EXPECT_GT(a ^ u_b, b);
+  EXPECT_EQ(a ^ b, a + b);
+
+  u64 c = 0;
+  EXPECT_EQ(~c, u64::MAX);
 }

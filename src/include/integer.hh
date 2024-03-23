@@ -140,6 +140,8 @@ class Integer {
     return Integer(num_ * other.num_);
   }
 
+  constexpr Integer operator%(const Integer<T> &other) const { return Integer(num_ % other.num_); }
+
   constexpr Integer abs() const noexcept(false) {
     if (num_ == min_) {
       throw std::runtime_error("abs overflow");
@@ -255,6 +257,26 @@ class Integer {
     *this >>= amount;
     return *this;
   }
+
+  Integer operator&(Integer other) { return Integer(num_ & other.num_); }
+  Integer operator&=(Integer other) {
+    num_ &= other.num_;
+    return *this;
+  }
+
+  Integer operator|(Integer other) { return Integer(num_ | other.num_); }
+  Integer operator|=(Integer other) {
+    num_ |= other.num_;
+    return *this;
+  }
+
+  Integer operator^(Integer other) { return Integer(num_ ^ other.num_); }
+  Integer operator^=(Integer other) {
+    num_ ^= other.num_;
+    return *this;
+  }
+
+  Integer operator~() { return Integer(~num_); }
 
   // prefix ++
   Integer &operator++() noexcept(false) {
@@ -389,6 +411,17 @@ constexpr Integer<T> operator*(U lhs, Integer<T> rhs) noexcept(false) {
 }
 
 template <typename T>
+constexpr Integer<T> &operator%=(Integer<T> lhs, Integer<T> rhs) noexcept(false) {
+  lhs = lhs % rhs;
+  return lhs;
+}
+
+template <typename U, typename T, typename = std::enable_if_t<std::is_signed_v<U> && std::is_convertible_v<U, T>>>
+constexpr Integer<T> operator%(U lhs, Integer<T> rhs) noexcept(false) {
+  return Integer<T>(lhs) % rhs;
+}
+
+template <typename T>
 constexpr bool operator==(Integer<T> lhs, Integer<T> rhs) {
   return lhs == rhs;
 }
@@ -423,6 +456,21 @@ constexpr bool operator<=(U lhs, Integer<T> rhs) noexcept {
   return Integer<T>(lhs) <= rhs;
 }
 
+template <typename U, typename T, typename = std::enable_if_t<std::is_signed_v<U> && std::is_convertible_v<U, T>>>
+constexpr Integer<T> operator&(U lhs, Integer<T> rhs) {
+  return Integer<T>(lhs) & rhs;
+}
+
+template <typename U, typename T, typename = std::enable_if_t<std::is_signed_v<U> && std::is_convertible_v<U, T>>>
+constexpr Integer<T> operator|(U lhs, Integer<T> rhs) {
+  return Integer<T>(lhs) | rhs;
+}
+
+template <typename U, typename T, typename = std::enable_if_t<std::is_signed_v<U> && std::is_convertible_v<U, T>>>
+constexpr Integer<T> operator^(U lhs, Integer<T> rhs) {
+  return Integer<T>(lhs) ^ rhs;
+}
+
 using i8 = Integer<int8_t>;
 using i16 = Integer<int16_t>;
 using i32 = Integer<int32_t>;
@@ -455,7 +503,9 @@ struct hash<numbers::i64> {
 // TODO hash collision
 template <>
 struct hash<numbers::i128> {
-  size_t operator()(const numbers::i128 &obj) const { return std::hash<numbers::int128>()(static_cast<numbers::int128>(obj)); }
+  size_t operator()(const numbers::i128 &obj) const {
+    return std::hash<numbers::int128>()(static_cast<numbers::int128>(obj));
+  }
 };
 
 }  // namespace std

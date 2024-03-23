@@ -1151,3 +1151,41 @@ TEST(integerTest, UnorderedSet) {
     ASSERT_EQ(s8.count(i), 1);
   }
 }
+
+TEST(integerTest, ModuloArithmetic) {
+  int i_a = 1234;
+  i64 a = i_a;
+  i64 b = a * 2;
+
+  EXPECT_EQ(i_a % b, a);
+  EXPECT_EQ(a % b, a);
+  EXPECT_EQ(b % a, 0);
+  EXPECT_EQ(b % i_a, 0);
+  ++b;
+  EXPECT_EQ(b % a, 1);
+}
+
+TEST(integerTest, BitOperations) {
+  int i_a = 1;
+  int i_b = 1 << 2;
+  i32 a = i_a;
+  i32 b = i_b;
+  EXPECT_EQ(a & b, 0);
+  EXPECT_EQ(i_a & b, 0);
+  EXPECT_EQ(a & b, 0);
+  EXPECT_EQ(a & i_b, 0);
+
+  EXPECT_GT(a | b, a);
+  EXPECT_GT(i_a | b, a);
+  EXPECT_GT(a | b, b);
+  EXPECT_GT(a | i_b, b);
+
+  EXPECT_GT(a ^ b, a);
+  EXPECT_GT(i_a ^ b, a);
+  EXPECT_GT(a ^ b, b);
+  EXPECT_GT(a ^ i_b, b);
+  EXPECT_EQ(a ^ b, a + b);
+
+  i32 c = 0;
+  EXPECT_EQ(~c, -1);
+}

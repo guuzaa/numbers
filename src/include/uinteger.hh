@@ -138,6 +138,8 @@ class Uinteger {
     return Uinteger(num_ * other.num_);
   }
 
+  constexpr Uinteger operator%(const Uinteger<T> &other) const { return Uinteger(num_ % other.num_); }
+
   constexpr Uinteger operator-() const noexcept(false) {
     if (num_ == min_) {
       return Uinteger(num_);
@@ -212,6 +214,26 @@ class Uinteger {
     return *this;
   }
 
+  Uinteger operator&(Uinteger other) { return Uinteger(num_ & other.num_); }
+  Uinteger operator&=(Uinteger other) {
+    num_ &= other.num_;
+    return *this;
+  }
+
+  Uinteger operator|(Uinteger other) { return Uinteger(num_ | other.num_); }
+  Uinteger operator|=(Uinteger other) {
+    num_ |= other.num_;
+    return *this;
+  }
+
+  Uinteger operator^(Uinteger other) { return Uinteger(num_ ^ other.num_); }
+  Uinteger operator^=(Uinteger other) {
+    num_ ^= other.num_;
+    return *this;
+  }
+
+  Uinteger operator~() { return Uinteger(~num_); }
+
   // prefix ++
   constexpr Uinteger &operator++() noexcept(false) {
     *this += 1;
@@ -261,10 +283,10 @@ class Uinteger {
   constexpr bool div_overflow(T a, T b) const noexcept { return false; }
 
   constexpr bool mul_overflow_helper(T a, T b) const {
-      if (a == 0 || b == 0) {
-        return false;
-      }
-      return (max_ / a) < b;
+    if (a == 0 || b == 0) {
+      return false;
+    }
+    return (max_ / a) < b;
   }
 
   constexpr bool mul_overflow(T a, T b) const {
@@ -317,6 +339,17 @@ constexpr Uinteger<T> operator/(U lhs, Uinteger<T> rhs) noexcept(false) {
 }
 
 template <typename T>
+constexpr Uinteger<T> &operator%=(Uinteger<T> lhs, Uinteger<T> rhs) noexcept(false) {
+  lhs = lhs % rhs;
+  return lhs;
+}
+
+template <typename U, typename T, typename = std::enable_if_t<std::is_convertible_v<U, T>>>
+constexpr Uinteger<T> operator%(U lhs, Uinteger<T> rhs) noexcept(false) {
+  return Uinteger<T>(lhs) % rhs;
+}
+
+template <typename T>
 constexpr Uinteger<T> &operator*=(Uinteger<T> lhs, Uinteger<T> rhs) noexcept(false) {
   lhs = lhs * rhs;
   return lhs;
@@ -342,7 +375,7 @@ constexpr bool operator==(U lhs, Uinteger<T> rhs) noexcept {
   return Uinteger<T>(lhs) == rhs;
 }
 
-template <typename U, typename T, typename = std::enable_if_t< std::is_convertible_v<U, T>>>
+template <typename U, typename T, typename = std::enable_if_t<std::is_convertible_v<U, T>>>
 constexpr bool operator>(U lhs, Uinteger<T> rhs) noexcept {
   return Uinteger<T>(lhs) > rhs;
 }
@@ -360,6 +393,21 @@ constexpr bool operator<(U lhs, Uinteger<T> rhs) noexcept {
 template <typename U, typename T, typename = std::enable_if_t<std::is_convertible_v<U, T>>>
 constexpr bool operator<=(U lhs, Uinteger<T> rhs) noexcept {
   return Uinteger<T>(lhs) <= rhs;
+}
+
+template <typename U, typename T, typename = std::enable_if_t<std::is_signed_v<U> && std::is_convertible_v<U, T>>>
+constexpr Uinteger<T> operator&(U lhs, Uinteger<T> rhs) {
+  return Uinteger<T>(lhs) & rhs;
+}
+
+template <typename U, typename T, typename = std::enable_if_t<std::is_signed_v<U> && std::is_convertible_v<U, T>>>
+constexpr Uinteger<T> operator|(U lhs, Uinteger<T> rhs) {
+  return Uinteger<T>(lhs) | rhs;
+}
+
+template <typename U, typename T, typename = std::enable_if_t<std::is_signed_v<U> && std::is_convertible_v<U, T>>>
+constexpr Uinteger<T> operator^(U lhs, Uinteger<T> rhs) {
+  return Uinteger<T>(lhs) ^ rhs;
 }
 
 using u8 = Uinteger<uint8_t>;
@@ -394,7 +442,9 @@ struct hash<numbers::u64> {
 // TODO hash collision
 template <>
 struct hash<numbers::u128> {
-  size_t operator()(const numbers::u128 &obj) const { return std::hash<numbers::uint128>()(static_cast<numbers::uint128>(obj)); }
+  size_t operator()(const numbers::u128 &obj) const {
+    return std::hash<numbers::uint128>()(static_cast<numbers::uint128>(obj));
+  }
 };
 
 }  // namespace std

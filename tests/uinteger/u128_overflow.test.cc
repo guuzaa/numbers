@@ -263,7 +263,7 @@ TEST(u128OverflowTest, DivThrow) {
   numbers::u128 b = 456;
   numbers::u128 c = 789;
 
-  EXPECT_NO_THROW(a / b); 
+  EXPECT_NO_THROW(a / b);
   EXPECT_NO_THROW(b / a);
 
   EXPECT_NO_THROW(a / c);
