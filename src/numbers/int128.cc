@@ -264,7 +264,7 @@ int128 make_int128_from_float(T v) {
   assert(std::isfinite(v) && (std::numeric_limits<T>::max_exponent <= 127 ||
                               (v >= -std::ldexp(static_cast<T>(1), 127) && v < std::ldexp(static_cast<T>(1), 127))));
   uint128 result = v < 0 ? -make_uint128_from_float(-v) : make_uint128_from_float(v);
-  return make_int128(int128_internal::BitCastToSigned(uint128_high64(result), uint128_low64(result)));
+  return make_int128(int128_internal::BitCastToSigned(uint128_high64(result)), uint128_low64(result));
 }
 
 }  // namespace
