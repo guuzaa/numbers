@@ -53,19 +53,19 @@ inline int128::operator float() const {
   // complement overwhelms the precision of the mantissa.
   //
   // Also check to make sure we don't negate Int128Min()
-  return v_ < 0 && *this != MIN ? -static_cast<float>(-*this)
+  return hi_ < 0 && *this != MIN ? -static_cast<float>(-*this)
                                 : static_cast<float>(lo_) + std::ldexp(static_cast<float>(hi_), 64);
 }
 
 inline int128::operator double() const {
   // See comment in int128::operator float() above.
-  return v_ < 0 && *this != MIN ? -static_cast<double>(-*this)
+  return hi_ < 0 && *this != MIN ? -static_cast<double>(-*this)
                                 : static_cast<double>(lo_) + std::ldexp(static_cast<double>(hi_), 64);
 }
 
 inline int128::operator long double() const {
   // See comment in int128::operator float() above.
-  return v_ < 0 && *this != MIN ? -static_cast<long double>(-*this)
+  return hi_ < 0 && *this != MIN ? -static_cast<long double>(-*this)
                                 : static_cast<long double>(lo_) + std::ldexp(static_cast<long double>(hi_), 64);
 }
 
