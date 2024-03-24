@@ -47,6 +47,77 @@ TYPED_TEST(Int128TraitsTest, ConstructAssignTest) {
                 "TypeParam must not be assignable from numbers::int128");
 }
 
+typedef ::testing::Types<float, double, long double> FloatTypes;
+
+template <typename T>
+class Int128FloatConversionTest : public ::testing::Test {};
+
+TYPED_TEST_SUITE(Int128FloatConversionTest, FloatTypes);
+
+TYPED_TEST(Int128FloatConversionTest, ConstructAndCastTest) {
+  // Conversions where the floating point values should be exactly the same.
+  for (int i = 0; i < 110; ++i) {
+    SCOPED_TRACE(::testing::Message() << "i = " << i);
+    TypeParam float_value = std::ldexp(static_cast<TypeParam>(0x9f4b), i);
+    int128 int_value = int128(0x9f4b) << i;
+
+    EXPECT_EQ(float_value, static_cast<TypeParam>(int_value));
+    EXPECT_EQ(-float_value, static_cast<TypeParam>(-int_value));
+    EXPECT_EQ(int_value, int128(float_value));
+    EXPECT_EQ(-int_value, int128(-float_value));
+  }
+
+  // Round trip conversions with a small sample of randomly generated uint64_t
+  // values (less than int64_t max so that value * 2^64 fits into int128).
+  uint64_t values[] = {0x6d4493c24fb86199, 0x26ecd65e4cb359b5, 0x2c43417433ba3fd1, 0x3b573ec669df6b55,
+                       0x1c751e55a29f4f0f};
+  for (uint64_t value : values) {
+    for (int i = 0; i <= 64; ++i) {
+      SCOPED_TRACE(::testing::Message() << "value = " << value << "; i = " << i);
+
+      TypeParam fvalue = std::ldexp(static_cast<TypeParam>(value), i);
+      EXPECT_DOUBLE_EQ(fvalue, static_cast<TypeParam>(int128(fvalue)));
+      EXPECT_DOUBLE_EQ(-fvalue, static_cast<TypeParam>(-int128(fvalue)));
+      EXPECT_DOUBLE_EQ(-fvalue, static_cast<TypeParam>(int128(-fvalue)));
+      EXPECT_DOUBLE_EQ(fvalue, static_cast<TypeParam>(-int128(-fvalue)));
+    }
+  }
+
+  // Round trip conversions with a small sample of random large positive values.
+  int128 large_values[] = {
+      make_int128(0x5b0640d96c7b3d9f, 0xb7a7089e51d18622), make_int128(0x34bed042c6f65270, 0x74b236570669a089),
+      make_int128(0x43debc9e6da12724, 0xf7f0f83da686797d), make_int128(0x71e8d483be4e5589, 0x75c3f96fb00752b6)};
+  for (int128 value : large_values) {
+    // Make value have as many significant bits as can be represented by
+    // the mantissa, also making sure the highest and lowest bit in the range
+    // are set.
+    value >>= (127 - std::numeric_limits<TypeParam>::digits);
+    value |= int128(1) << (std::numeric_limits<TypeParam>::digits - 1);
+    value |= 1;
+    for (int i = 0; i < 127 - std::numeric_limits<TypeParam>::digits; ++i) {
+      int128 int_value = value << i;
+      EXPECT_EQ(int_value, static_cast<int128>(static_cast<TypeParam>(int_value)));
+      EXPECT_EQ(-int_value, static_cast<int128>(static_cast<TypeParam>(-int_value)));
+    }
+  }
+
+  // Small sample of checks that rounding is toward zero
+  EXPECT_EQ(0, int128(TypeParam(0.01)));
+  EXPECT_EQ(17, int128(TypeParam(17.8)));
+  EXPECT_EQ(0, int128(TypeParam(-0.803)));
+  EXPECT_EQ(-53, int128(TypeParam(-53.1)));
+  EXPECT_EQ(0, int128(TypeParam(0.5)));
+  EXPECT_EQ(0, int128(TypeParam(-0.05)));
+  TypeParam just_lt_one = std::nexttoward(TypeParam(1), TypeParam(0));
+  EXPECT_EQ(0, int128(just_lt_one));
+  TypeParam just_gt_minus_one = std::nexttoward(TypeParam(-1), TypeParam(0));
+  EXPECT_EQ(0, int128(just_gt_minus_one));
+
+  // Check limits
+  EXPECT_DOUBLE_EQ(std::ldexp(static_cast<TypeParam>(1), 127), static_cast<TypeParam>(int128_max()));
+  EXPECT_DOUBLE_EQ(-std::ldexp(static_cast<TypeParam>(1), 127), static_cast<TypeParam>(int128_min()));
+}
+
 TEST(Int128Test, BoolConversion) {
   EXPECT_FALSE(int128(0));
   for (int i = 0; i < 64; ++i) {

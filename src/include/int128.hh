@@ -259,7 +259,6 @@ class int128 {
   constexpr explicit operator unsigned __int128() const;
 #endif
 
-  // TODO unimplemented!
   explicit operator float() const;
   explicit operator double() const;
   explicit operator long double() const;
@@ -723,8 +722,6 @@ inline uint128 operator*(uint128 lhs, uint128 rhs) {
   return result;
 #endif
 }
-
-// TODO implement division and modulo
 
 // Increment/decrement operators
 inline uint128 uint128::operator++(int) {

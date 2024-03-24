@@ -28,7 +28,11 @@ class Integer {
   constexpr Integer() noexcept : num_{} {}
 
   template <typename U, typename = std::enable_if_t<std::is_convertible_v<U, T>>>
-  Integer(U num) noexcept : num_{static_cast<T>(num)} {}
+  Integer(U num) : num_{static_cast<T>(num)} {}
+
+  Integer(float num) noexcept : num_{static_cast<T>(num)} {}
+  Integer(double num) noexcept : num_{static_cast<T>(num)} {}
+  Integer(long double num) noexcept : num_{static_cast<T>(num)} {}
 
   constexpr Integer operator+(Integer<T> other) const noexcept(false) {
     if (add_overflow(num_, other.num_)) {

@@ -30,6 +30,10 @@ class Uinteger {
   template <typename U, typename = std::enable_if_t<std::is_convertible_v<U, T>>>
   Uinteger(U num) noexcept : num_{static_cast<T>(num)} {}
 
+  Uinteger(float num) noexcept : num_{static_cast<T>(num)} {}
+  Uinteger(double num) noexcept : num_{static_cast<T>(num)} {}
+  Uinteger(long double num) noexcept : num_{static_cast<T>(num)} {}
+
   constexpr Uinteger operator+(const Uinteger<T> &other) const noexcept(false) {
     if (add_overflow(num_, other.num_)) {
       throw std::runtime_error("add overflow");
