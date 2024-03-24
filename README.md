@@ -70,7 +70,7 @@ std::cout << ret << '\n';
 ### wrapping add
 ```c++
 numbers::u128 max = numbers::u128::MAX;
-auto ret = max.wrapping_add(1);
+numbers::u128 ret = max.wrapping_add(1); // wrapping around
 std::cout << ret << '\n';
 ```
 </details>
