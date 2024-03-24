@@ -5,12 +5,6 @@ numbers
 [![CMake CI Matrix](https://github.com/guuzaa/numbers/actions/workflows/cmake.yml/badge.svg?branch=main)](https://github.com/guuzaa/numbers/actions/workflows/cmake.yml)
 ![language c++17](https://img.shields.io/badge/Language-C++17-red)
 [![license mit](https://img.shields.io/badge/License-MIT-pink)](https://github.com/guuzaa/numbers/blob/main/LICENSE.txt)
-![linux](https://img.shields.io/badge/OS-Linux-blue)
-![macOS](https://img.shields.io/badge/OS-macOS-blue)
-![windows](https://img.shields.io/badge/OS-Windows-blue)
-
-> [!IMPORTANT]  
-> This project is in the early stages of development. The codebase is subject to significant changes and reorganization. Expect breaking changes as we refine the architecture, fix bugs, and implement new features.
 
 `numbers` is a library for C++17 and later versions that handles integer overflow similar to Rust. It simplifies integer overflow situations.
 
@@ -18,11 +12,14 @@ numbers
 
 - **Full Control** over handling integer overflow
 
+- **Support for Multiple Toolchains**: GCC, Clang, MSVC
+
 - Same as **Primitive Types** (WIP)
 
-- **Support Integers**: i8, i16, i32, i64, u8, u16, u32, u64, even i128 & u128 (not ready yet)
+- **Support for Various Integer Type**: i8, i16, i32, i64, u8, u16, u32, u64, even i128 & u128
 
-## Usage
+<details>
+<summary>Usage</summary>
 
 ### operator +
 ```c++
@@ -69,10 +66,11 @@ std::cout << "a= " << a << ", b= " << b << '\n';
 numbers::i64 ret = a.saturating_mul(b);
 std::cout << ret << '\n';
 ```
+</details>
 
 ## Contribute
 
-We welcome contributions, but please be aware that the project's design and conventions are still evolving. If you'd like to contribute, it's a good idea to discuss your plans with the project maintainers before starting work.
+If you'd like to contribute, it's a good idea to discuss your plans with the project maintainers before starting work.
 
 For the latest updates and discussions, please see our [issues](https://github.com/guuzaa/numbers/issues) and [pull requests](https://github.com/guuzaa/numbers/pulls).
 

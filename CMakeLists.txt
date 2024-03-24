@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 
-set(version 0.0.3)
+set(version 0.1.0)
 
 project(numbers VERSION ${version} LANGUAGES CXX)
 

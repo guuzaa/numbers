@@ -111,7 +111,25 @@ std::string uint128_to_formatted_string(uint128 v, std::ios_base::fmtflags flags
   return os.str();
 }
 
+template <typename T>
+uint128 make_uint128_from_float(T v) {
+  static_assert(std::is_floating_point<T>::value, "");
+  // Undefined behavior if v is NaN or cannot fit into uint128
+  assert(std::isfinite(v) && v > -1 &&
+         (std::numeric_limits<T>::max_exponent <= 128 || v < std::ldexp(static_cast<T>(1), 128)));
+
+  if (v >= std::ldexp(static_cast<T>(1), 64)) {
+    uint64_t hi = static_cast<uint64_t>(std::ldexp(v, -64));
+    uint64_t lo = static_cast<uint64_t>(v - std::ldexp(static_cast<T>(hi), 64));
+    return make_uint128(hi, lo);
+  }
+  return make_uint128(0, static_cast<uint64_t>(v));
+}
 }  // namespace
+
+uint128::uint128(float v) : uint128(make_uint128_from_float(v)) {}
+uint128::uint128(double v) : uint128(make_uint128_from_float(v)) {}
+uint128::uint128(long double v) : uint128(make_uint128_from_float(v)) {}
 
 }  // namespace numbers
 
@@ -235,5 +253,26 @@ std::ostream &operator<<(std::ostream &os, int128 v) {
 }
 
 std::string int128::to_string() const { return uint128_to_formatted_string(*this, std::ios_base::dec); }
+
+#ifndef NUMBERS_HAVE_INTRINSTIC_INT128
+namespace {
+
+template <typename T>
+int128 make_int128_from_float(T v) {
+  // Conversion when v is NaN or cannot fit into int128 would be undefined
+  // behavior if using an intrinsic 128-bit integer.
+  assert(std::isfinite(v) && (std::numeric_limits<T>::max_exponent <= 127 ||
+                              (v >= -std::ldexp(static_cast<T>(1), 127) && v < std::ldexp(static_cast<T>(1), 127))));
+  uint128 result = v < 0 ? -make_uint128_from_float(-v) : make_uint128_from_float(v);
+  return make_int128(int128_internal::BitCastToSigned(uint128_high64(result)), uint128_low64(result));
+}
+
+}  // namespace
+
+int128::int128(float v) : int128(make_int128_from_float(v)) {}
+int128::int128(double v) : int128(make_int128_from_float(v)) {}
+int128::int128(long double v) : int128(make_int128_from_float(v)) {}
+
+#endif
 
 }  // namespace numbers

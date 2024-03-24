@@ -46,6 +46,29 @@ constexpr int128::operator long long() const { return int128_internal::BitCastTo
 
 constexpr int128::operator unsigned long long() const { return static_cast<unsigned long long>(lo_); }
 
+inline int128::operator float() const {
+  // We must convert the absolute value and then negate as needed, because
+  // floating point types are typically sign-magnitude. Otherwise, the
+  // difference between the high and low 64 bits when interpreted as two's
+  // complement overwhelms the precision of the mantissa.
+  //
+  // Also check to make sure we don't negate Int128Min()
+  return hi_ < 0 && *this != MIN ? -static_cast<float>(-*this)
+                                 : static_cast<float>(lo_) + std::ldexp(static_cast<float>(hi_), 64);
+}
+
+inline int128::operator double() const {
+  // See comment in int128::operator float() above.
+  return hi_ < 0 && *this != MIN ? -static_cast<double>(-*this)
+                                 : static_cast<double>(lo_) + std::ldexp(static_cast<double>(hi_), 64);
+}
+
+inline int128::operator long double() const {
+  // See comment in int128::operator float() above.
+  return hi_ < 0 && *this != MIN ? -static_cast<long double>(-*this)
+                                 : static_cast<long double>(lo_) + std::ldexp(static_cast<long double>(hi_), 64);
+}
+
 // Comparison operators
 constexpr bool operator==(int128 lhs, int128 rhs) {
   return (int128_low64(lhs) == int128_low64(rhs) && int128_high64(lhs) == int128_high64(rhs));
