@@ -66,6 +66,13 @@ std::cout << "a= " << a << ", b= " << b << '\n';
 numbers::i64 ret = a.saturating_mul(b);
 std::cout << ret << '\n';
 ```
+
+### wrapping add
+```c++
+numbers::u128 max = numbers::u128::MAX;
+auto ret = max.wrapping_add(1);
+std::cout << ret << '\n';
+```
 </details>
 
 ## Contribute
