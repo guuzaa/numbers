@@ -124,7 +124,6 @@ cmake --build build -t test-uinteger
 
 ### Format code
 
-> [!CAUTION]
 > It requires that your machine has `clang-format` installed
 
 ```shell
