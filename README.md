@@ -78,7 +78,9 @@ std::cout << ret << '\n';
 
 ### Prerequisite
 
-Make sure CMake and GCC/Clang/MSVC installed on your machine.
+Make sure that CMake and GCC/Clang/MSVC are installed on your machine.
+
+The source code, example code and test code are located in the [`src`](https://github.com/guuzaa/numbers/tree/main/src), [`examples`](https://github.com/guuzaa/numbers/tree/main/examples) and [`tests`](https://github.com/guuzaa/numbers/tree/main/tests) directory, respectively. 
 
 ### Generate build recipe
 
