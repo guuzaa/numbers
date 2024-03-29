@@ -14,12 +14,10 @@ numbers
 
 - **Support for Multiple Toolchains**: GCC, Clang, MSVC
 
-- Same as **Primitive Types** (WIP)
-
 - **Support for Various Integer Type**: i8, i16, i32, i64, u8, u16, u32, u64, even i128 & u128
 
 <details>
-<summary>Usage</summary>
+<summary>Examples</summary>
 
 ### operator +
 ```c++
@@ -73,6 +71,59 @@ numbers::u128 max = numbers::u128::MAX;
 numbers::u128 ret = max.wrapping_add(1); // wrapping around
 std::cout << ret << '\n';
 ```
+</details>
+
+<details>
+<summary>How to build</summary>
+
+### Prerequisite
+
+Make sure CMake and GCC/Clang/MSVC installed on your machine.
+
+### Generate build recipe
+
+```shell
+cmake -Bbuild
+# If you are keen on Ninja
+cmake -B build -G Ninja
+```
+
+### Build and run all examples
+
+```shell
+cmake --build build -t example
+```
+
+#### Build and run an exact example
+
+```shell
+cmake --build build -t example-[filename]
+# If you want to run the file examples/hash.cc 
+cmake --build build -t example-hash
+# If you want to run a new file you are writing in the ./examples
+cmake --build build -t example-your-file-name-with-no-extensions
+```
+
+### Build and run all tests
+
+```shell
+cmake --build build -t run-tests
+```
+
+There are two test binaries: integer_test, uinteger_test. Type the following commands to run them:
+
+```shell
+cmake --build build -t test-integer
+cmake --build build -t test-uinteger
+```
+
+### Format code
+
+```shell
+cmake --build build -t check-format
+cmake --build build -t format
+```
+
 </details>
 
 ## Contribute
