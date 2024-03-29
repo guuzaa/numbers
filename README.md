@@ -16,8 +16,10 @@ numbers
 
 - **Support for Various Integer Type**: i8, i16, i32, i64, u8, u16, u32, u64, even i128 & u128
 
+## Examples
+
 <details>
-<summary>Examples</summary>
+<summary>Show More</summary>
 
 ### operator +
 ```c++
@@ -73,12 +75,13 @@ std::cout << ret << '\n';
 ```
 </details>
 
+## How to build
 <details>
-<summary>How to build</summary>
+<summary>Show More</summary>
 
 ### Prerequisite
 
-Make sure that CMake and GCC/Clang/MSVC are installed on your machine.
+Make sure that `CMake` and `GCC`/`Clang`/`MSVC` are installed on your machine.
 
 The source code, example code and test code are located in the [`src`](https://github.com/guuzaa/numbers/tree/main/src), [`examples`](https://github.com/guuzaa/numbers/tree/main/examples) and [`tests`](https://github.com/guuzaa/numbers/tree/main/tests) directory, respectively. 
 
@@ -120,6 +123,10 @@ cmake --build build -t test-uinteger
 ```
 
 ### Format code
+
+> [!CAUTION]
+
+> It requires that your machine has `clang-format` installed
 
 ```shell
 cmake --build build -t check-format
