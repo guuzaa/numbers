@@ -87,7 +87,7 @@ if(NUMBERS_TEST)
     )
 
     # Provide only the minimum source files needed by downstream users
-    set(package_files src/ CMakeLists.txt LICENSE.txt)
+    set(package_files src/ CMakeLists.txt README.md LICENSE.txt)
     set(packaged_zip ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-src.zip)
     add_custom_command(
         OUTPUT ${packaged_zip}
