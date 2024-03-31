@@ -28,21 +28,26 @@ When performing arithmetic operations in C++, handling integer overflow can be t
 To ease the difficulty of handling integer overflow, `numbers` supports five kinds of operations:
 
 1. Vanilla arithmetic operations include +, -, *, /, abs, and unary -.
-    > Different from these operators of primitive types, if an overflow occurs, they'll throw an exception.
-    >
+
+    Different from these operators of primitive types, if an overflow occurs, they'll throw an exception.
+
     > NOTE: The abs operator is only support by signed integers. The unsigned integers don't need to perform the abs operation. The following abs variants adhere to the same principle.
 
 2. Checked operations include `checked_add`, `checked_sub`, `checked_div`, `checked_mul`, `checked_neg`, and `checked_abs`.
-    > These operators return `std::optional` if no overflow occurs, and `std::nullopt` if an overflow does occur.
+
+    These operators return `std::optional` if no overflow occurs, or `std::nullopt` if an overflow does occur.
 
 3. Overflowing operations include `overflowing_add`, `overflowing_sub`, `overflowing_div`, `overflowing_mul`, `overflowing_neg`, and `overflowing_abs`.
-    > These operators return a `std::tuple` of the operation result and a boolean indicating whether an overflow would occur. If an overflow would have occurred then the wrapped value is returned.
+
+    These operators return a `std::tuple` of the operation result and a boolean indicating whether an overflow would occur. If an overflow would have occurred then the wrapped value is returned.
 4. Saturating operations include `saturating_add`, `saturating_sub`, `saturating_div`, `saturating_mul`, `saturating_neg`, and `saturating_abs`.
-    > These operators return the saturating value at the numeric bounds instead of overflowing.
-    >
+
+    These operators return the saturating value at the numeric bounds instead of overflowing.
+
     > NOTE: The `saturating_neg` isn't supported by unsigned integers.
 5. Wrapping (modular) arithmetic operations include `wrapping_add`, `wrapping_sub`, `wrapping_div`, `wrapping_mul`, `wrapping_neg`, and `wrapping_abs`.
-    > The return values of these operators are wrapping around at the boundary of the type.
+
+    The return values of these operators are wrapping around at the boundary of the type.
 
 
 </details>
