@@ -14,12 +14,52 @@ numbers
 
 - **Support for Multiple Toolchains**: GCC, Clang, MSVC
 
-- Same as **Primitive Types** (WIP)
-
 - **Support for Various Integer Type**: i8, i16, i32, i64, u8, u16, u32, u64, even i128 & u128
 
+## Documents
+
 <details>
-<summary>Usage</summary>
+<summary>Show More</summary>
+
+### Background
+
+When performing arithmetic operations in C++, handling integer overflow can be time-consuming and frustrating. To simplify this process, we have developed this library - `numbers`.
+
+### Supported Functions
+
+`numbers` provides various integer types, consisting of i8, i16, i32, i64, i128, u8, u16, u32, u64, u128.
+
+To ease the difficulty of handling integer overflow, all integer types support the following five types of operations:
+
+1. Vanilla arithmetic operations include +, -, *, /, abs, and unary -.
+
+    If an overflow occurs, they'll throw an exception.
+
+    > NOTE: The abs operator is only support by signed integers. The unsigned integers don't need the abs operation. The following abs variants adhere to the same principle.
+
+2. Checked operations include `checked_add`, `checked_sub`, `checked_div`, `checked_mul`, `checked_neg`, and `checked_abs`.
+
+    They return `std::optional` if no overflow occurs, or `std::nullopt` if an overflow occurs.
+
+3. Overflowing operations include `overflowing_add`, `overflowing_sub`, `overflowing_div`, `overflowing_mul`, `overflowing_neg`, and `overflowing_abs`.
+
+    They return a `std::tuple` of the operation result and a boolean indicating whether an overflow would occur. If an overflow would have occurred then the wrapped value is returned.
+4. Saturating operations include `saturating_add`, `saturating_sub`, `saturating_div`, `saturating_mul`, `saturating_neg`, and `saturating_abs`.
+
+    They return the saturating value at the numeric bounds instead of overflowing.
+
+    > NOTE: The `saturating_neg` isn't supported by unsigned integers.
+5. Wrapping (modular) arithmetic operations include `wrapping_add`, `wrapping_sub`, `wrapping_div`, `wrapping_mul`, `wrapping_neg`, and `wrapping_abs`.
+
+    The return values of them are wrapping around at the boundary of the type.
+
+
+</details>
+
+## Examples
+
+<details>
+<summary>Show More</summary>
 
 ### operator +
 ```c++
@@ -73,6 +113,64 @@ numbers::u128 max = numbers::u128::MAX;
 numbers::u128 ret = max.wrapping_add(1); // wrapping around
 std::cout << ret << '\n';
 ```
+</details>
+
+## How to build
+<details>
+<summary>Show More</summary>
+
+### Prerequisite
+
+Make sure that `CMake` and `GCC`/`Clang`/`MSVC` are installed on your machine.
+
+The source code, example code and test code are located in the [`src`](https://github.com/guuzaa/numbers/tree/main/src), [`examples`](https://github.com/guuzaa/numbers/tree/main/examples) and [`tests`](https://github.com/guuzaa/numbers/tree/main/tests) directory, respectively. 
+
+### Generate build recipe
+
+```shell
+cmake -B build
+# If you are keen on Ninja
+cmake -B build -G Ninja
+```
+
+### Build and run all examples
+
+```shell
+cmake --build build -t example
+```
+
+#### Build and run an exact example
+
+```shell
+cmake --build build -t example-[filename]
+# If you want to run the file examples/hash.cc 
+cmake --build build -t example-hash
+# If you want to run a new file you are writing in the ./examples
+cmake --build build -t example-your-file-name-with-no-extensions
+```
+
+### Build and run all tests
+
+```shell
+cmake --build build -t run-tests
+```
+
+There are two test binaries: integer_test, uinteger_test. To run them, type the following commands:
+
+```shell
+cmake --build build -t test-integer
+cmake --build build -t test-uinteger
+```
+
+### Format code
+
+> It requires that your machine has `clang-format` installed
+
+```shell
+cmake --build build -t check-format
+cmake --build build -t format
+```
+
 </details>
 
 ## Contribute
